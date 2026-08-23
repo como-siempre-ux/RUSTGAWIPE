@@ -3,11 +3,16 @@ name: Publicar en GitHub Pages
 on:
   push:
     branches: [main]
-  # Refresca los datos cada día a las 05:00 UTC, un rato antes del forced
-  # wipe de los primeros jueves. Sin esto la población y las ips se quedarían
-  # congeladas en el momento del último push.
+  # Cada 3 horas.
+  #
+  # Con una vez al día no bastaba desde que la lista se ordena por población:
+  # a las 05:00 UTC Europa está durmiendo y América acabando, así que la foto
+  # salía en el peor momento posible y el orden no reflejaba qué servidores
+  # están llenos de verdad. Cada 3 horas siempre hay una foto reciente.
+  #
+  # Los repos públicos no gastan minutos de Actions, así que esto es gratis.
   schedule:
-    - cron: '0 5 * * *'
+    - cron: '0 */3 * * *'
   # Para lanzarlo a mano desde la pestaña Actions.
   workflow_dispatch:
 

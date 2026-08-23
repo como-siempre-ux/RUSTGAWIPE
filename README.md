@@ -247,9 +247,23 @@ que las cifras se leyeran que no se veía la imagen.
 ## Publicado en GitHub Pages
 
 El sitio se despliega solo con [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml): en
-cada push a `main`, y además una vez al día para que la población no se quede congelada en el
-último push. Corre los tests y el typecheck **antes** de construir: más vale no publicar que
-publicar algo roto.
+cada push a `main` y **cada 3 horas**. Corre los tests y el typecheck **antes** de construir: más
+vale no publicar que publicar algo roto.
+
+### Qué se actualiza solo y qué no
+
+| | cada cuánto |
+|---|---|
+| cuenta atrás y "wipea en 3h" | **en el navegador, cada 30 s** — nunca envejecen |
+| lista de servidores, población e ips | cada 3 horas, al redesplegar |
+| horarios de las comunidades (`lib/catalog.ts`) | **nunca**: están escritos a mano |
+
+Lo de cada 3 horas no es capricho: desde que la lista se ordena por población, una foto diaria
+salía a una hora concreta (Europa dormida) y el orden no reflejaba qué servidores están llenos de
+verdad.
+
+**Aviso de GitHub:** las tareas programadas se desactivan solas si el repositorio pasa 60 días sin
+actividad. Si algún día ves los datos parados, entra en la pestaña Actions y reactívalas.
 
 ### El problema que había que resolver
 
