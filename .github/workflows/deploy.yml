@@ -43,20 +43,44 @@ jobs:
       - name: Comprobación de tipos
         run: npm run typecheck
 
-      - name: Cocinar los datos
-        # Si el repo tiene el secreto STEAM_API_KEY, sale la lista en vivo con
-        # población e ip reales. Si no, sale el catálogo. Nunca falla por no
-        # tener clave, y la clave no acaba en el sitio publicado: sólo los
-        # datos que devuelve.
+      - name: Cocinar los datos y construir
+        # Un solo paso a propósito: `build:static` ya ejecuta `build:data` por
+        # dentro. Cuando esto eran dos pasos, el primero traía los 300
+        # servidores de Steam y el segundo los machacaba con el catálogo,
+        # porque la clave sólo estaba en el primero. El despliegue salía en
+        # verde y publicaba los datos equivocados.
+        #
+        # Con el secreto STEAM_API_KEY sale la lista en vivo con población e ip
+        # reales; sin él, el catálogo. Nunca falla por no tener clave, y la
+        # clave no acaba en el sitio publicado: sólo los datos que devuelve.
         env:
           STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
-        run: npm run build:data
-
-      - name: Build estático
-        env:
           # GitHub Pages publica el proyecto en /<repo>/.
           BASE_PATH: /${{ github.event.repository.name }}
         run: npm run build:static
+
+      - name: Comprobar que se publica lo que se pretendía
+        # Este paso existe porque ya pasó: el build salió en verde publicando
+        # el catálogo cuando había clave y debía publicar la lista en vivo.
+        # Que el despliegue no falle no significa que los datos sean los
+        # correctos, así que se comprueba el fichero final.
+        env:
+          STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+        run: |
+          FUENTE=$(node -p "require('./out/data/servers.json').source")
+          CUANTOS=$(node -p "require('./out/data/servers.json').count")
+          echo "Publicando: fuente=$FUENTE · $CUANTOS servidores"
+
+          if [ -n "$STEAM_API_KEY" ] && [ "$FUENTE" != "steam" ]; then
+            echo "✗ Hay clave de Steam pero se iba a publicar '$FUENTE'."
+            echo "  Revisa el paso anterior: algo ha sobrescrito los datos en vivo."
+            exit 1
+          fi
+          if [ "$CUANTOS" -lt 100 ]; then
+            echo "✗ Sólo $CUANTOS servidores. Algo ha ido mal."
+            exit 1
+          fi
+          echo "✓ Los datos publicados son los esperados."
 
       - name: Comprobar que la clave no se ha colado en el sitio
         # Red de seguridad: si algún día alguien mete la clave en un componente
