@@ -78,7 +78,11 @@ export function WipeBoard({
   const load = useCallback(async (silencioso = false) => {
     if (!silencioso) setState({ status: 'loading' });
     try {
-      const res = await fetch(DATA_URL);
+      // `no-cache` no significa "no cachees": significa "pregunta siempre si
+      // ha cambiado". GitHub Pages sirve con max-age=600, así que sin esto
+      // la gente vería datos de hasta 10 minutos antes tras cada despliegue.
+      // Con revalidación, cuando no ha cambiado nada responde un 304 vacío.
+      const res = await fetch(DATA_URL, { cache: 'no-cache' });
       const json = await res.json();
       if (!res.ok) {
         throw new Error(json?.detail || json?.error || `error ${res.status}`);
