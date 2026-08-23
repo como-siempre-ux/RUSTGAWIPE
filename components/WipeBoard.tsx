@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { reresolveAll } from '@/lib/normalize';
 import { DAY_MS, HOUR_MS } from '@/lib/time';
+import { nextForcedWipe } from '@/lib/wipe-schedule';
 import type { RustServer, WipesPayload } from '@/lib/types';
 
 import {
@@ -31,6 +33,18 @@ const WIPED_MS: Record<WipedKey, number | null> = {
 
 /** Cada cuánto se vuelve a pedir la lista, para que no se quede vieja. */
 const REFRESH_MS = 5 * 60_000;
+
+/**
+ * De dónde salen los datos.
+ *
+ * Con servidor, del route handler, que los recalcula en cada petición. En el
+ * sitio estático de GitHub Pages no hay servidor, así que se lee el fichero
+ * cocinado en el build. En los dos casos las horas se rehacen aquí abajo con
+ * el reloj del navegador, así que da igual lo viejo que sea el fichero.
+ */
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+const DATA_URL =
+  process.env.NEXT_PUBLIC_STATIC === '1' ? `${BASE_PATH}/data/servers.json` : '/api/wipes';
 
 type State =
   | { status: 'loading' }
@@ -64,7 +78,7 @@ export function WipeBoard({
   const load = useCallback(async (silencioso = false) => {
     if (!silencioso) setState({ status: 'loading' });
     try {
-      const res = await fetch('/api/wipes');
+      const res = await fetch(DATA_URL);
       const json = await res.json();
       if (!res.ok) {
         throw new Error(json?.detail || json?.error || `error ${res.status}`);
@@ -101,7 +115,16 @@ export function WipeBoard({
     };
   }, [load]);
 
-  const servers = state.status === 'ready' ? state.data.servers : [];
+  /**
+   * Las horas se rehacen aquí, con el reloj del navegador, en vez de usar las
+   * que trae el payload. En un sitio estático ese payload es del build, que
+   * puede ser de hace días: "wipea en 3h" quedaría congelado. Rehaciéndolo, la
+   * lista es correcta aunque los datos sean viejos.
+   */
+  const servers = useMemo(
+    () => (state.status === 'ready' ? reresolveAll(state.data.servers, nowMs) : []),
+    [state, nowMs],
+  );
 
   const regions = useMemo(
     () => [...new Set(servers.map((s) => s.region).filter(Boolean) as string[])].sort(),
@@ -135,9 +158,9 @@ export function WipeBoard({
 
       <div className="grid items-center gap-4 px-4 pt-4 md:grid-cols-[1fr_minmax(0,38%)] md:gap-8">
         <div className="order-last md:order-first md:px-0">
-          <ForcedWipeCountdown
-            targetMs={state.status === 'ready' ? state.data.nextForcedWipeMs : Date.now()}
-          />
+          {/* Calculado aquí, no leído del payload: es determinista y así no
+              caduca aunque los datos sean de otro mes. */}
+          <ForcedWipeCountdown targetMs={nextForcedWipe(nowMs)} />
         </div>
         <div className="order-first md:order-last">{portada}</div>
       </div>

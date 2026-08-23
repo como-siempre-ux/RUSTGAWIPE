@@ -1,6 +1,13 @@
 import Image from 'next/image';
 
 /**
+ * GitHub Pages publica el proyecto bajo /<repo>/, y con `images.unoptimized`
+ * (obligatorio en el export estático) `next/image` NO antepone el `basePath`
+ * al `src`: lo deja tal cual y la imagen da 404. Hay que ponerlo a mano.
+ */
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
+/**
  * Portada del sitio.
  *
  * El original vive en la carpeta `Imagenes/` del proyecto y se publica desde
@@ -15,7 +22,7 @@ export function Portada() {
   return (
     <figure className="relative m-0 aspect-[16/10] w-full overflow-hidden rounded-sm border border-weld shadow-plate sm:aspect-[16/9] md:aspect-[4/3]">
       <Image
-        src="/imagenes/portada.png"
+        src={`${BASE_PATH}/imagenes/portada.png`}
         alt="Portada de RUSTGAWIPE: un superviviente de Rust al atardecer."
         fill
         priority

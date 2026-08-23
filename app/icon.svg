@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="4" fill="#0D0A08"/>
+  <!-- Chapa oxidada con una muesca: el reloj que corre es el countdown -->
+  <path d="M6 9h20v3H6zM6 14.5h13v3H6zM6 20h20v3H6z" fill="#B4441F"/>
+  <circle cx="24" cy="16" r="3.2" fill="#F0821E"/>
+</svg>

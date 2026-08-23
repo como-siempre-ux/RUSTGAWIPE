@@ -1,0 +1,86 @@
+name: Publicar en GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # Refresca los datos cada día a las 05:00 UTC, un rato antes del forced
+  # wipe de los primeros jueves. Sin esto la población y las ips se quedarían
+  # congeladas en el momento del último push.
+  schedule:
+    - cron: '0 5 * * *'
+  # Para lanzarlo a mano desde la pestaña Actions.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Si se solapan dos despliegues, gana el último; no se cancela el que ya está
+# publicando para no dejar el sitio a medias.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      # Las comprobaciones van antes del build: más vale no publicar que
+      # publicar algo roto.
+      - name: Tests
+        run: npm test
+
+      - name: Comprobación de tipos
+        run: npm run typecheck
+
+      - name: Cocinar los datos
+        # Si el repo tiene el secreto STEAM_API_KEY, sale la lista en vivo con
+        # población e ip reales. Si no, sale el catálogo. Nunca falla por no
+        # tener clave, y la clave no acaba en el sitio publicado: sólo los
+        # datos que devuelve.
+        env:
+          STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+        run: npm run build:data
+
+      - name: Build estático
+        env:
+          # GitHub Pages publica el proyecto en /<repo>/.
+          BASE_PATH: /${{ github.event.repository.name }}
+        run: npm run build:static
+
+      - name: Comprobar que la clave no se ha colado en el sitio
+        # Red de seguridad: si algún día alguien mete la clave en un componente
+        # de cliente, esto revienta el despliegue en vez de publicarla.
+        env:
+          STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+        run: |
+          if [ -n "$STEAM_API_KEY" ] && grep -rq "$STEAM_API_KEY" out/; then
+            echo "✗ La clave de Steam aparece en out/. No se publica."
+            exit 1
+          fi
+          echo "✓ Ninguna credencial en out/."
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

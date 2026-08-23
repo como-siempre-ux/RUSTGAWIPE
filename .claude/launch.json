@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "rustgawipe-static",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "preview:static"],
+      "port": 4173
     }
   ]
 }

@@ -74,7 +74,44 @@ export function normalizeServer(
     url: raw.url ?? match?.community.url ?? null,
     community: match?.community.name ?? null,
     source,
+
+    rule: match?.rule ?? null,
+    sourceLastWipeMs: parseIso(raw.lastWipeIso),
+    sourceTags: tagsFor(raw),
   };
+}
+
+/**
+ * Rehace la resolución con la hora que se le pase. La usa el cliente para que
+ * las horas sean correctas aunque el payload venga de un build de hace días,
+ * que es lo que pasa en un sitio estático.
+ */
+export function reresolve(server: RustServer, nowMs: number): RustServer {
+  const r = resolveNextWipe(
+    {
+      name: server.name,
+      tags: server.sourceTags,
+      type: server.type,
+      lastWipeMs: server.sourceLastWipeMs,
+      rule: server.rule,
+    },
+    nowMs,
+  );
+
+  return {
+    ...server,
+    nextWipeMs: r.nextWipeMs,
+    lastWipeMs: r.lastWipeMs,
+    lastWipeIsDerived: r.lastWipeIsDerived,
+    confidence: r.confidence,
+    cadence: r.cadence,
+    wipeExplanation: r.explanation,
+  };
+}
+
+/** Rehace la lista entera y la vuelve a ordenar. */
+export function reresolveAll(servers: RustServer[], nowMs: number): RustServer[] {
+  return sortServers(servers.map((s) => reresolve(s, nowMs)));
 }
 
 /** Ordena por wipe más próximo; a igualdad, por fiabilidad y luego población. */

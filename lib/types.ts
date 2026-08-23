@@ -88,6 +88,27 @@ export interface RustServer {
   community: string | null;
   /** De dónde salió la fila. */
   source: 'battlemetrics' | 'steam' | 'catalog';
+
+  // --- Para recalcular las horas en el cliente ------------------------------
+  //
+  // Los campos de arriba (`nextWipeMs`, `lastWipeMs`, `confidence`…) se
+  // calculan cuando se genera el payload. En un sitio estático ese momento es
+  // el del build, que puede ser de hace días: "wipea en 3h" quedaría
+  // congelado y mintiendo.
+  //
+  // Por eso el payload lleva también lo que hace falta para rehacer la cuenta
+  // con el reloj del navegador. Lo de arriba vale para el primer pintado; a
+  // partir de ahí manda lo de aquí.
+
+  /** Calendario de la comunidad, si la tiene. */
+  rule: ScheduleRule | null;
+  /**
+   * Último wipe según la fuente (etiqueta `born` de Steam). Es un instante
+   * absoluto, así que no caduca aunque el payload sea viejo.
+   */
+  sourceLastWipeMs: number | null;
+  /** Tipo tal como lo dio la fuente, para rehacer la heurística del nombre. */
+  sourceTags: string[];
 }
 
 export interface WipesPayload {

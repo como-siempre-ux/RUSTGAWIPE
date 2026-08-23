@@ -11,7 +11,10 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check:steam": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-steam.mts"
+    "check:steam": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-steam.mts",
+    "build:data": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-dataset.mts",
+    "build:static": "npm run build:data && node scripts/build-static.mjs",
+    "preview:static": "node scripts/serve-static.mjs"
   },
   "dependencies": {
     "next": "15.5.4",

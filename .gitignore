@@ -22,3 +22,7 @@ yarn-error.log*
 # distingue mayúsculas) esta regla también tapaba `public/imagenes/`, que sí
 # tiene que ir al repo porque es de donde Next sirve la portada.
 /Imagenes/
+
+# Datos cocinados en el build; se regeneran con `npm run build:data`.
+/public/data/
+/out/
