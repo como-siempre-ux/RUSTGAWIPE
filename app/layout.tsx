@@ -22,10 +22,48 @@ const body = Barlow({
   display: 'swap',
 });
 
+/**
+ * La web se comparte por WhatsApp y Discord, y ahí lo primero que ve la gente
+ * es la tarjeta del enlace, no la web. Sin estas etiquetas se pega como un
+ * texto pelado.
+ *
+ * `metadataBase` tiene que ser absoluta: las apps de mensajería no resuelven
+ * rutas relativas. Sale del entorno para que valga igual en local, en Pages y
+ * en cualquier otro sitio.
+ */
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://como-siempre-ux.github.io/RUSTGAWIPE/';
+
+const TITULO = 'RUSTGAWIPE — ¿qué servidores de rust wipean pronto?';
+const DESCRIPCION =
+  'los servidores de rust ordenados por lo que falta para su próximo wipe, con cuenta atrás al forced wipe mensual. filtros por tipo, región, tamaño de grupo y mapa recién estrenado.';
+
 export const metadata: Metadata = {
-  title: 'RUSTGAWIPE — ¿qué servidores de rust wipean pronto?',
-  description:
-    'lista de servidores de rust ordenada por proximidad del próximo wipe, con countdown al forced wipe mensual.',
+  metadataBase: new URL(SITE_URL),
+  title: TITULO,
+  description: DESCRIPCION,
+  openGraph: {
+    type: 'website',
+    locale: 'es_ES',
+    url: SITE_URL,
+    siteName: 'RUSTGAWIPE',
+    title: TITULO,
+    description: DESCRIPCION,
+    images: [
+      {
+        url: 'imagenes/portada.png',
+        width: 1672,
+        height: 941,
+        alt: 'RUSTGAWIPE: un superviviente de Rust al atardecer.',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TITULO,
+    description: DESCRIPCION,
+    images: ['imagenes/portada.png'],
+  },
 };
 
 export const viewport: Viewport = {
