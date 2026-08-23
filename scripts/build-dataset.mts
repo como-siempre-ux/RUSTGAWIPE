@@ -21,11 +21,20 @@ import { dirname, join } from 'node:path';
 
 import { CATALOG_SERVERS, matchCommunity, regionLabel } from '../lib/catalog.ts';
 import { detectGroupLimit } from '../lib/group-size.ts';
-import { parseGameType, steamServerType } from '../lib/sources/steam-tags.ts';
+import { parseGameType, steamRegionLabel, steamServerType } from '../lib/sources/steam-tags.ts';
 
 const RUST_APPID = 252490;
 const ENDPOINT = 'https://api.steampowered.com/IGameServersService/GetServerList/v1/';
-const LIMIT = 300;
+/**
+ * Se piden muchos y se recortan por población.
+ *
+ * `GetServerList` no ordena por jugadores: devuelve lo que le apetece. Con
+ * limit=300 salían 300 servidores al azar de los ~20.000 que hay, y no
+ * aparecían ni Rustafied ni Rustoria ni Atlas. Pidiendo 5.000 y quedándonos
+ * con los más poblados salen los que la gente busca de verdad.
+ */
+const LIMIT_PETICION = 5000;
+const CUANTOS_PUBLICAR = 300;
 const SALIDA = join(process.cwd(), 'public', 'data', 'servers.json');
 
 interface Crudo {
@@ -37,6 +46,8 @@ interface Crudo {
   players: number | null;
   maxPlayers: number | null;
   country: string | null;
+  /** Región según el código numérico de Steam, cuando la fuente lo da. */
+  region: string | null;
   lastWipeMs: number | null;
   worldSize: number | null;
 }
@@ -60,7 +71,7 @@ function leerEnvLocal(): Record<string, string> {
 
 async function desdeSteam(key: string): Promise<Crudo[]> {
   const filter = ['\\appid\\', String(RUST_APPID), '\\dedicated\\1', '\\empty\\1'].join('');
-  const url = `${ENDPOINT}?key=${encodeURIComponent(key)}&limit=${LIMIT}&filter=${encodeURIComponent(filter)}`;
+  const url = `${ENDPOINT}?key=${encodeURIComponent(key)}&limit=${LIMIT_PETICION}&filter=${encodeURIComponent(filter)}`;
 
   const res = await fetch(url);
   if (!res.ok) throw new Error(`steam respondió ${res.status}`);
@@ -71,7 +82,10 @@ async function desdeSteam(key: string): Promise<Crudo[]> {
   const servers = json.response?.servers ?? [];
   if (servers.length === 0) throw new Error('steam devolvió una lista vacía');
 
-  return servers.map((s) => {
+  console.log(`  Steam ha devuelto ${servers.length}; nos quedamos con los ${CUANTOS_PUBLICAR} de más gente.`);
+
+  return servers
+    .map((s) => {
     const tags = parseGameType(s.gametype as string);
     const name = (s.name as string) ?? '(sin nombre)';
     const [ip, portStr] = String(s.addr ?? '').split(':');
@@ -84,10 +98,13 @@ async function desdeSteam(key: string): Promise<Crudo[]> {
       players: (s.players as number) ?? tags.currentPlayers,
       maxPlayers: (s.max_players as number) ?? tags.maxPlayers,
       country: null,
+      region: steamRegionLabel(s.region as number),
       lastWipeMs: tags.bornMs,
       worldSize: null,
     };
-  });
+    })
+    .sort((a, b) => (b.players ?? 0) - (a.players ?? 0))
+    .slice(0, CUANTOS_PUBLICAR);
 }
 
 function desdeCatalogo(): Crudo[] {
@@ -100,6 +117,7 @@ function desdeCatalogo(): Crudo[] {
     players: c.typicalPlayers,
     maxPlayers: c.maxPlayers,
     country: c.country,
+    region: null,
     lastWipeMs: null,
     worldSize: c.mapSize,
   }));
@@ -131,7 +149,8 @@ function normalizar(crudos: Crudo[], source: string) {
       maxPlayers: raw.maxPlayers,
       groupLimit: detectGroupLimit(raw.name),
       country: raw.country ? raw.country.toUpperCase() : null,
-      region: regionLabel(raw.name, raw.country),
+      // La región de Steam manda; si no la da, se deduce del nombre.
+      region: raw.region ?? regionLabel(raw.name, raw.country),
       mapSize: raw.worldSize,
       mapSeed: null,
       url: match?.community.url ?? null,

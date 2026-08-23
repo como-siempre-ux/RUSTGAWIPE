@@ -74,6 +74,35 @@ export function parseGameType(gametype: string | null | undefined): SteamTags {
   return out;
 }
 
+/**
+ * Región a partir del código numérico de Steam.
+ *
+ * Steam no da el país, pero sí este campo, y es mucho más fiable que buscar
+ * "EU" o "US" en el nombre: la mayoría de los servidores no lo llevan.
+ */
+export function steamRegionLabel(region: number | null | undefined): string | null {
+  switch (region) {
+    case 0: // costa este de EEUU
+    case 1: // costa oeste de EEUU
+      return 'Norteamérica';
+    case 2:
+      return 'Sudamérica';
+    case 3:
+      return 'Europa';
+    case 4:
+      return 'Asia';
+    case 5:
+      return 'Oceanía';
+    case 6:
+      return 'Oriente Medio';
+    case 7:
+      return 'África';
+    default:
+      // 255 es "mundo" y significa que el servidor no lo declara.
+      return null;
+  }
+}
+
 /** Tipo de servidor deducido de las etiquetas de Steam y del nombre. */
 export function steamServerType(tags: SteamTags, name: string): string {
   const n = name.toLowerCase();

@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseGameType, steamServerType, toRawFromSteam } from '../sources/steam';
+import {
+  parseGameType,
+  steamRegionLabel,
+  steamServerType,
+  toRawFromSteam,
+} from '../sources/steam';
 
 /**
  * Rust mete sus etiquetas en el campo `gametype` de Steam, separadas por
@@ -55,6 +60,28 @@ describe('steamServerType', () => {
 
   it('el resto -> community', () => {
     expect(steamServerType(parseGameType('stok'), 'Servidor de Pepe')).toBe('community');
+  });
+});
+
+describe('steamRegionLabel', () => {
+  it.each([
+    [0, 'Norteamérica'],
+    [1, 'Norteamérica'],
+    [2, 'Sudamérica'],
+    [3, 'Europa'],
+    [4, 'Asia'],
+    [5, 'Oceanía'],
+    [6, 'Oriente Medio'],
+    [7, 'África'],
+  ])('código %i -> %s', (code, label) => {
+    expect(steamRegionLabel(code)).toBe(label);
+  });
+
+  it('"mundo" y los ausentes no dicen nada: null, para caer al nombre', () => {
+    expect(steamRegionLabel(255)).toBeNull();
+    expect(steamRegionLabel(-1)).toBeNull();
+    expect(steamRegionLabel(null)).toBeNull();
+    expect(steamRegionLabel(undefined)).toBeNull();
   });
 });
 

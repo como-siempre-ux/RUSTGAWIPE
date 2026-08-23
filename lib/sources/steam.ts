@@ -15,18 +15,23 @@ import 'server-only';
 
 import { steamResponseSchema, type SteamServer } from '../types';
 import type { RawServer } from './battlemetrics';
-import { parseGameType, steamServerType } from './steam-tags';
+import { parseGameType, steamRegionLabel, steamServerType } from './steam-tags';
 
 // Re-exportados para que quien use el adaptador no tenga que saber que el
 // parseo vive aparte.
-export { parseGameType, steamServerType };
+export { parseGameType, steamRegionLabel, steamServerType };
 export type { SteamTags } from './steam-tags';
 
 const RUST_APPID = 252490;
 const ENDPOINT = 'https://api.steampowered.com/IGameServersService/GetServerList/v1/';
 
-/** Cuántos servidores pedir. Steam ordena por relevancia/población. */
-export const STEAM_LIMIT = 300;
+/**
+ * `GetServerList` no ordena por jugadores: devuelve lo que le apetece. Con
+ * limit=300 salían 300 servidores al azar de los ~20.000 que hay, sin las
+ * comunidades grandes. Se piden muchos y se recortan por población.
+ */
+export const STEAM_LIMIT_PETICION = 5000;
+export const STEAM_CUANTOS = 300;
 
 export function toRawFromSteam(s: SteamServer): RawServer {
   const tags = parseGameType(s.gametype);
@@ -61,7 +66,7 @@ export async function fetchSteam(signal?: AbortSignal): Promise<RawServer[]> {
   if (!key) throw new Error('steam: falta STEAM_API_KEY');
 
   const filter = ['\\appid\\', String(RUST_APPID), '\\dedicated\\1', '\\empty\\1'].join('');
-  const url = `${ENDPOINT}?key=${encodeURIComponent(key)}&limit=${STEAM_LIMIT}&filter=${encodeURIComponent(filter)}`;
+  const url = `${ENDPOINT}?key=${encodeURIComponent(key)}&limit=${STEAM_LIMIT_PETICION}&filter=${encodeURIComponent(filter)}`;
 
   const res = await fetch(url, { signal, cache: 'no-store' });
   if (!res.ok) {
@@ -75,5 +80,6 @@ export async function fetchSteam(signal?: AbortSignal): Promise<RawServer[]> {
 
   return (parsed.data.response.servers ?? [])
     .map(toRawFromSteam)
-    .sort((a, b) => (b.players ?? 0) - (a.players ?? 0));
+    .sort((a, b) => (b.players ?? 0) - (a.players ?? 0))
+    .slice(0, STEAM_CUANTOS);
 }
