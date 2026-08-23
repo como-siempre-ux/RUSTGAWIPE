@@ -37,7 +37,7 @@ Así que la app tiene **tres fuentes** detrás de la misma interfaz, y usa la pr
 | # | Fuente | Necesita | Qué da |
 |---|---|---|---|
 | 1 | BattleMetrics | `BATTLEMETRICS_TOKEN` (suscripción **de pago**) | lo más completo: tipo, país, mapa, seed, a veces el próximo wipe exacto |
-| 2 | Steam Web API | `STEAM_API_KEY` (**gratis**, 2 minutos) | lista real con población en vivo, ip y último wipe |
+| 2 | Steam Web API | `STEAM_API_KEY` (**gratis**, 2 minutos) | los 300 servidores con más gente, con población, ip y último wipe reales |
 | 3 | Catálogo local | nada | sólo comunidades conocidas, con su calendario publicado |
 
 ### La opción recomendada: Steam
@@ -71,10 +71,14 @@ El truco: Rust mete sus etiquetas en el campo `gametype` de Steam, y una de ella
 `born<unix>`, que es la fecha del último wipe. El parser está en
 [`lib/sources/steam.ts`](lib/sources/steam.ts).
 
-> El adaptador de Steam está escrito contra la forma documentada del endpoint y su parser tiene
-> tests con etiquetas reales, pero **no se ha podido probar contra el endpoint en vivo** porque
-> no había clave disponible al construirlo. Si algo falla al meter la tuya, mira la consola del
-> servidor: la app cae al catálogo y te dice por qué en el aviso amarillo de arriba.
+**`GetServerList` no ordena por jugadores**: devuelve lo que le apetece. Pidiendo 300 salían 300
+servidores al azar de los ~20.000 que hay, sin Rustafied, sin Rustoria, sin Atlas — justo lo que
+la web tiene que enseñar. Se piden 5.000 y se publican los 300 de más gente.
+
+Steam tampoco da el país, pero sí un **código numérico de región**, que es mucho más fiable que
+buscar "EU" o "US" en el nombre. Se usa ese, y el nombre sólo como respaldo.
+
+Si algo falla, la app cae al catálogo y te dice por qué en el aviso de arriba.
 
 ### Sin ninguna clave
 
@@ -182,7 +186,7 @@ Todo el cálculo vive en [`lib/wipe-schedule.ts`](lib/wipe-schedule.ts) y ningun
   enero.
 
 ```bash
-npm test        # 101 tests
+npm test        # 110 tests
 npm run typecheck
 ```
 
