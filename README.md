@@ -1,5 +1,7 @@
 # RUSTGAWIPE
 
+**https://como-siempre-ux.github.io/RUSTGAWIPE/**
+
 Una web que responde a una sola pregunta: **¿qué servidores de Rust wipean pronto?**
 
 Lista ordenada por proximidad del próximo wipe, con countdown al forced wipe mensual de
@@ -180,7 +182,7 @@ Todo el cálculo vive en [`lib/wipe-schedule.ts`](lib/wipe-schedule.ts) y ningun
   enero.
 
 ```bash
-npm test        # 95 tests
+npm test        # 101 tests
 npm run typecheck
 ```
 
@@ -237,6 +239,50 @@ copy Imagenes\tu-imagen.png public\imagenes\portada.png
 
 Va al lado del countdown, no de fondo: puesta detrás había que taparla con tanto degradado para
 que las cifras se leyeran que no se veía la imagen.
+
+## Publicado en GitHub Pages
+
+El sitio se despliega solo con [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml): en
+cada push a `main`, y además una vez al día para que la población no se quede congelada en el
+último push. Corre los tests y el typecheck **antes** de construir: más vale no publicar que
+publicar algo roto.
+
+### El problema que había que resolver
+
+Pages sólo sirve archivos: no hay servidor, así que `/api/wipes` no existe allí. Si el JSON
+publicado llevara las horas ya resueltas, estarían congeladas en el momento del build y la web
+mentiría a los dos días — "wipea en 3h" durante una semana entera.
+
+Por eso el payload **no lleva horas resueltas**, lleva el calendario de cada servidor, y el
+navegador rehace la cuenta con su propio reloj. El sitio dice la verdad aunque el build sea de
+hace un mes. Lo único que envejece es la población y la ip, y el aviso de arriba lo dice.
+`lib/__tests__/reresolve.test.ts` lo comprueba con un payload de hace 31 días.
+
+### Antes de publicar, míralo como lo verá la gente
+
+```bash
+npm run build:static
+npm run preview:static
+```
+
+Sirve `out/` bajo `/RUSTGAWIPE/`, igual que Pages. No es un lujo: con esto salió que
+`next/image` con `images.unoptimized` **no** antepone el `basePath` al `src`, así que la portada
+daba 404. Abriendo `out/index.html` con doble clic no se habría visto.
+
+### Datos en vivo en la web publicada (opcional)
+
+Sin nada configurado, se publica el catálogo. Para que la web publicada traiga población e ip
+reales, añade la clave de Steam como **secreto del repositorio** (Settings → Secrets and
+variables → Actions → New repository secret), con nombre `STEAM_API_KEY`.
+
+Los secretos de Actions no se exponen aunque el repo sea público, y al sitio sólo llegan los
+datos que devuelve Steam, nunca la clave. El workflow lo comprueba antes de desplegar: si la
+clave apareciera en `out/`, el despliegue falla en vez de publicarla.
+
+### Dónde se despliega
+
+`basePath` sale del nombre del repo automáticamente en el workflow. Si lo renombras o le pones
+un dominio propio, ajusta `BASE_PATH`.
 
 ## Qué no hay (y es a propósito)
 
