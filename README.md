@@ -186,7 +186,7 @@ Todo el cálculo vive en [`lib/wipe-schedule.ts`](lib/wipe-schedule.ts) y ningun
   enero.
 
 ```bash
-npm test        # 110 tests
+npm test        # 131 tests
 npm run typecheck
 ```
 

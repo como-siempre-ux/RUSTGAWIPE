@@ -14,6 +14,7 @@
 import 'server-only';
 
 import { steamResponseSchema, type SteamServer } from '../types';
+import { esServidorDeWipe } from '../server-kind';
 import type { RawServer } from './battlemetrics';
 import { parseGameType, steamRegionLabel, steamServerType } from './steam-tags';
 
@@ -80,6 +81,8 @@ export async function fetchSteam(signal?: AbortSignal): Promise<RawServer[]> {
 
   return (parsed.data.response.servers ?? [])
     .map(toRawFromSteam)
+    // Los de aimtrain, creative y bedwars no wipean: no pintan nada aquí.
+    .filter((s) => esServidorDeWipe(s.name))
     .sort((a, b) => (b.players ?? 0) - (a.players ?? 0))
     .slice(0, STEAM_CUANTOS);
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { CATALOG_SERVERS, COMMUNITIES } from '../catalog';
-import { catalogAsServers, normalizeAll, sortServers } from '../normalize';
+import { catalogAsServers, normalizeAll, sortByPopulation, sortServers } from '../normalize';
 import type { RawServer } from '../sources/battlemetrics';
 
 const NOW = Date.parse('2025-08-20T12:00:00.000Z');
@@ -50,6 +50,36 @@ describe('normalizeServer', () => {
   it('descarta ids repetidos', () => {
     const out = normalizeAll([raw({ id: 'a' }), raw({ id: 'a' })], NOW, 'steam');
     expect(out).toHaveLength(1);
+  });
+});
+
+describe('sortByPopulation', () => {
+  const base = normalizeAll([raw({})], NOW, 'steam')[0];
+
+  it('los de más gente primero', () => {
+    const list = [
+      { ...base, id: 'poca', players: 40 },
+      { ...base, id: 'mucha', players: 800 },
+      { ...base, id: 'media', players: 300 },
+    ];
+    expect(sortByPopulation(list).map((s) => s.id)).toEqual(['mucha', 'media', 'poca']);
+  });
+
+  it('a igual población gana el que wipee antes', () => {
+    const list = [
+      { ...base, id: 'tarde', players: 100, nextWipeMs: NOW + 9000 },
+      { ...base, id: 'pronto', players: 100, nextWipeMs: NOW + 1000 },
+    ];
+    expect(sortByPopulation(list).map((s) => s.id)).toEqual(['pronto', 'tarde']);
+  });
+
+  it('los que no dicen cuánta gente tienen van al final, no arriba con un 0', () => {
+    const list = [
+      { ...base, id: 'sinDato', players: null },
+      { ...base, id: 'vacio', players: 0 },
+      { ...base, id: 'lleno', players: 500 },
+    ];
+    expect(sortByPopulation(list).map((s) => s.id)).toEqual(['lleno', 'vacio', 'sinDato']);
   });
 });
 

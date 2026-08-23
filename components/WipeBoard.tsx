@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { reresolveAll } from '@/lib/normalize';
+import { reresolveAll, sortByPopulation } from '@/lib/normalize';
 import { DAY_MS, HOUR_MS } from '@/lib/time';
 import { nextForcedWipe } from '@/lib/wipe-schedule';
 import type { RustServer, WipesPayload } from '@/lib/types';
@@ -135,10 +135,12 @@ export function WipeBoard({
     [servers],
   );
 
-  const visible = useMemo(
-    () => servers.filter((s) => matches(s, filters, nowMs)),
-    [servers, filters, nowMs],
-  );
+  const visible = useMemo(() => {
+    const filtrados = servers.filter((s) => matches(s, filters, nowMs));
+    // `reresolveAll` ya devuelve la lista ordenada por wipe más próximo, así
+    // que sólo hay que reordenar cuando se pide por población.
+    return filters.sort === 'poblacion' ? sortByPopulation(filtrados) : filtrados;
+  }, [servers, filters, nowMs]);
 
   const groupCounts = useMemo(() => {
     const counts: Record<number, number> = {};
@@ -258,6 +260,7 @@ function matches(s: RustServer, f: Filters, nowMs: number): boolean {
 
 function isDirty(f: Filters): boolean {
   return (
+    f.sort !== DEFAULT_FILTERS.sort ||
     f.types.length > 0 ||
     f.window !== 'todos' ||
     f.wiped !== 'cualquiera' ||

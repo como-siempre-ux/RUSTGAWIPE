@@ -10,7 +10,11 @@ export type GroupKey = -1 | 0 | 1 | 2 | 3 | 4 | 5;
 /** Ventana hacia atrás: servidores que acaban de wipear. */
 export type WipedKey = 'cualquiera' | '24h' | '48h';
 
+/** Criterio de orden de la lista. */
+export type SortKey = 'poblacion' | 'wipe';
+
 export interface Filters {
+  sort: SortKey;
   types: ServerType[];
   window: WindowKey;
   wiped: WipedKey;
@@ -21,6 +25,9 @@ export interface Filters {
 }
 
 export const DEFAULT_FILTERS: Filters = {
+  // Los servidores con más gente primero. La cuenta atrás del forced wipe
+  // sigue arriba, y "wipea en 6h" está a un clic para el otro caso de uso.
+  sort: 'poblacion',
   types: [],
   window: 'todos',
   wiped: 'cualquiera',
@@ -29,6 +36,16 @@ export const DEFAULT_FILTERS: Filters = {
   group: -1,
   query: '',
 };
+
+/**
+ * "Más gente" ordena por jugadores conectados ahora mismo. No hay histórico
+ * de picos en ninguna de las fuentes, así que es el mejor indicador de
+ * popularidad disponible.
+ */
+const SORTS: Array<{ key: SortKey; label: string }> = [
+  { key: 'poblacion', label: 'más gente' },
+  { key: 'wipe', label: 'wipea antes' },
+];
 
 const TYPES: Array<{ key: ServerType; label: string }> = [
   { key: 'official', label: 'oficial' },
@@ -111,6 +128,19 @@ export function FilterBar({
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-3">
+        <Group label="ordenar por">
+          {SORTS.map((o) => (
+            <Chip
+              key={o.key}
+              group="ordenar por"
+              active={filters.sort === o.key}
+              onClick={() => set('sort', o.key)}
+            >
+              {o.label}
+            </Chip>
+          ))}
+        </Group>
+
         <Group label="tipo">
           {TYPES.map((t) => (
             <Chip

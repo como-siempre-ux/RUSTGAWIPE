@@ -21,6 +21,7 @@ import { dirname, join } from 'node:path';
 
 import { CATALOG_SERVERS, matchCommunity, regionLabel } from '../lib/catalog.ts';
 import { detectGroupLimit } from '../lib/group-size.ts';
+import { esServidorDeWipe } from '../lib/server-kind.ts';
 import { parseGameType, steamRegionLabel, steamServerType } from '../lib/sources/steam-tags.ts';
 
 const RUST_APPID = 252490;
@@ -82,9 +83,14 @@ async function desdeSteam(key: string): Promise<Crudo[]> {
   const servers = json.response?.servers ?? [];
   if (servers.length === 0) throw new Error('steam devolvió una lista vacía');
 
-  console.log(`  Steam ha devuelto ${servers.length}; nos quedamos con los ${CUANTOS_PUBLICAR} de más gente.`);
+  // Fuera los que no wipean (aimtrain, creative, bedwars…): en una web de
+  // wipes son ruido, y ordenando por población se comían el primer puesto.
+  const deWipe = servers.filter((s) => esServidorDeWipe((s.name as string) ?? ''));
+  console.log(
+    `  Steam ha devuelto ${servers.length}; ${servers.length - deWipe.length} no wipean (aimtrain, creative…). Publicamos los ${CUANTOS_PUBLICAR} de más gente.`,
+  );
 
-  return servers
+  return deWipe
     .map((s) => {
     const tags = parseGameType(s.gametype as string);
     const name = (s.name as string) ?? '(sin nombre)';

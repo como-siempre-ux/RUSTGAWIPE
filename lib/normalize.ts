@@ -114,6 +114,25 @@ export function reresolveAll(servers: RustServer[], nowMs: number): RustServer[]
   return sortServers(servers.map((s) => reresolve(s, nowMs)));
 }
 
+/**
+ * Ordena por población: los servidores con más gente primero.
+ *
+ * A igualdad de jugadores gana el que wipee antes, y los que no tienen dato
+ * de población van al final en vez de mezclarse arriba con un 0.
+ */
+export function sortByPopulation(servers: RustServer[]): RustServer[] {
+  return [...servers].sort((a, b) => {
+    const pa = a.players ?? -1;
+    const pb = b.players ?? -1;
+    if (pa !== pb) return pb - pa;
+
+    if (a.nextWipeMs === null && b.nextWipeMs === null) return 0;
+    if (a.nextWipeMs === null) return 1;
+    if (b.nextWipeMs === null) return -1;
+    return a.nextWipeMs - b.nextWipeMs;
+  });
+}
+
 /** Ordena por wipe más próximo; a igualdad, por fiabilidad y luego población. */
 export function sortServers(servers: RustServer[]): RustServer[] {
   return [...servers].sort((a, b) => {
