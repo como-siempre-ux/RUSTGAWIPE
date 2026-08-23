@@ -19,8 +19,10 @@
 import type { Cadence, ScheduleRule, ServerType } from './types';
 
 const MON = 1;
+const TUE = 2;
 const THU = 4;
 const FRI = 5;
+const SAT = 6;
 
 interface CommunityDef {
   slug: string;
@@ -44,6 +46,13 @@ interface CommunityDef {
   /** Ciclo y día por defecto de la comunidad. */
   cadence: Cadence;
   weekday: number;
+  /** Varios días de wipe por semana. Si está, manda sobre `weekday`. */
+  weekdays?: number[];
+  /**
+   * El ciclo se conoce pero la hora exacta no se ha podido verificar contra
+   * una fuente oficial. La UI lo baja a `estimado` en vez de `programado`.
+   */
+  approximate?: boolean;
   /**
    * Ajustes por palabras del nombre del servidor, en orden. El primero gana.
    * Ojo con el orden: `\bweekly\b` también casa dentro de "Bi-weekly" (el
@@ -54,6 +63,7 @@ interface CommunityDef {
     match: RegExp;
     cadence?: Cadence;
     weekday?: number;
+    weekdays?: number[];
     hourLocal?: number;
   }>;
   human: string;
@@ -188,6 +198,7 @@ export const COMMUNITIES: CommunityDef[] = [
   },
   {
     slug: 'rustopia',
+    approximate: true, // ciclo conocido, hora sin verificar contra su web
     name: 'Rustopia',
     match: /rustopia/i,
     url: 'https://rustopia.gg',
@@ -205,6 +216,7 @@ export const COMMUNITIES: CommunityDef[] = [
   },
   {
     slug: 'picklerust',
+    approximate: true, // ciclo conocido, hora sin verificar contra su web
     name: 'PickleRust',
     match: /pickle\s*rust|picklerust/i,
     url: 'https://picklerust.com',
@@ -235,6 +247,7 @@ export const COMMUNITIES: CommunityDef[] = [
   },
   {
     slug: 'rustinity',
+    approximate: true, // ciclo conocido, hora sin verificar contra su web
     name: 'Rustinity',
     match: /rustinity/i,
     url: 'https://rustinity.com',
@@ -252,6 +265,7 @@ export const COMMUNITIES: CommunityDef[] = [
   },
   {
     slug: 'rustfactor',
+    approximate: true, // ciclo conocido, hora sin verificar contra su web
     name: 'Rust Factor',
     match: /rust\s*factor|rustfactor/i,
     url: 'https://rustfactor.com',
@@ -269,6 +283,7 @@ export const COMMUNITIES: CommunityDef[] = [
   },
   {
     slug: 'vital-rust',
+    approximate: true, // ciclo conocido, hora sin verificar contra su web
     name: 'Vital Rust',
     match: /vital\s*rust|vitalrust/i,
     url: 'https://vitalrust.com',
@@ -286,6 +301,7 @@ export const COMMUNITIES: CommunityDef[] = [
   },
   {
     slug: 'atlas-rust',
+    approximate: true, // ciclo conocido, hora sin verificar contra su web
     name: 'Atlas Rust',
     match: /atlas\s*rust|atlasrust/i,
     url: 'https://atlasrust.com',
@@ -302,7 +318,69 @@ export const COMMUNITIES: CommunityDef[] = [
     human: 'wipe semanal los jueves a las 15:00 hora local',
   },
   {
+    slug: 'warbandits',
+    name: 'WarBandits',
+    match: /war\s*bandits|warbandits/i,
+    url: 'https://warbandits.gg',
+    sourceUrl: 'https://warbandits.gg/servers',
+    verified: '2026-08-23',
+    // Su web lista fechas de wipe pero no la hora ni el día fijo: se sabe
+    // que el ciclo es de ~3,5 días (dos wipes por semana), no la hora.
+    approximate: true,
+    hourLocal: 14,
+    cadence: 'weekly',
+    weekday: MON,
+    weekdays: [MON, FRI],
+    overrides: [
+      { match: /\bmonthly\b/i, cadence: 'monthly' },
+      { match: /\bbi-?\s?weekly\b/i, cadence: 'biweekly' },
+    ],
+    human: 'dos wipes por semana, ciclo de unos 3-4 días (lunes y viernes)',
+  },
+  {
+    slug: 'werewolf',
+    name: 'Werewolf Gaming',
+    match: /werewolf/i,
+    url: 'https://werewolfgaming.co',
+    sourceUrl: 'https://www.battlemetrics.com/servers/rust/15988648',
+    verified: '2026-08-23',
+    approximate: true,
+    hourLocal: 14,
+    cadence: 'weekly',
+    weekday: MON,
+    overrides: [
+      { match: /\bmonthly\b/i, cadence: 'monthly' },
+      { match: /\bbi-?\s?weekly\b/i, cadence: 'biweekly' },
+      { match: /\bthursday?s?\b/i, cadence: 'weekly', weekday: THU },
+      { match: /\bfriday?s?\b/i, cadence: 'weekly', weekday: FRI },
+    ],
+    human: 'wipe semanal los lunes; hora aproximada, sobre las 13:00 UTC',
+  },
+  {
+    slug: 'survivors-gg',
+    name: 'Survivors.gg',
+    match: /survivors\.?\s*gg|survivors\.gg/i,
+    url: 'https://survivors.gg',
+    sourceUrl: 'https://www.battlemetrics.com/servers/rust/11900765',
+    verified: '2026-08-23',
+    // Todos sus servidores están en Europa y wipean en hora centroeuropea.
+    fixedTimeZone: 'Europe/Berlin',
+    hourLocal: 14,
+    cadence: 'weekly',
+    weekday: THU,
+    overrides: [
+      // Cada servidor numerado tiene su propio día; van antes que lo genérico.
+      { match: /#\s*1\b/, cadence: 'weekly', weekdays: [MON, THU], hourLocal: 14 },
+      { match: /#\s*5\b/, cadence: 'weekly', weekday: FRI, hourLocal: 14 },
+      { match: /#\s*6\b/, cadence: 'weekly', weekdays: [TUE, SAT], hourLocal: 15 },
+      { match: /\bmonthly\b/i, cadence: 'monthly' },
+      { match: /\bbi-?\s?weekly\b/i, cadence: 'biweekly' },
+    ],
+    human: 'fullwipe y map wipe semanales, en hora centroeuropea; el día va por servidor',
+  },
+  {
     slug: 'reddit-rust',
+    approximate: true, // ciclo conocido, hora sin verificar contra su web
     name: 'Reddit Rust',
     match: /\breddit\b.*\brust\b|\brust\b.*\breddit\b|\/r\/(playrust|rust)\b/i,
     url: 'https://www.reddit.com/r/playrust/',
@@ -348,13 +426,20 @@ export function matchCommunity(serverName: string): CommunityMatch | null {
 
   let cadence = community.cadence;
   let weekday = community.weekday;
+  let weekdays = community.weekdays;
   let hourLocal = community.hourLocal;
 
   for (const ov of community.overrides ?? []) {
     if (ov.match.test(serverName)) {
       cadence = ov.cadence ?? cadence;
-      weekday = ov.weekday ?? weekday;
       hourLocal = ov.hourLocal ?? hourLocal;
+      // Un override que fija un día concreto anula la lista de varios días.
+      if (ov.weekdays) {
+        weekdays = ov.weekdays;
+      } else if (ov.weekday !== undefined) {
+        weekday = ov.weekday;
+        weekdays = undefined;
+      }
       break;
     }
   }
@@ -365,9 +450,11 @@ export function matchCommunity(serverName: string): CommunityMatch | null {
       community: community.name,
       cadence,
       weekday,
+      weekdays,
       hourLocal,
       minuteLocal: community.minuteLocal ?? 0,
       timeZone: community.fixedTimeZone ?? regionTimeZone(serverName),
+      approximate: community.approximate,
       human: community.human,
     },
   };
@@ -387,6 +474,12 @@ export interface CatalogServer {
   maxPlayers: number;
   mapSize: number | null;
 }
+
+/**
+ * El tamaño de grupo no se declara aquí: se deduce del nombre igual que en
+ * los datos en vivo, así la misma lógica cubre las dos fuentes y no hay dos
+ * verdades que mantener sincronizadas.
+ */
 
 /**
  * Servidores famosos de Rust, para que la app responda algo útil sin token.
@@ -456,6 +549,36 @@ export const CATALOG_SERVERS: CatalogServer[] = [
   { id: 'cat-atlasrust-eu', name: 'Atlas Rust EU Main', type: 'modded', country: 'DE', typicalPlayers: 150, maxPlayers: 250, mapSize: 4000 },
   { id: 'cat-rustez-us', name: 'RustEZ US Medium PvE', type: 'modded', country: 'US', typicalPlayers: 120, maxPlayers: 200, mapSize: 4000 },
   { id: 'cat-rustez-eu', name: 'RustEZ EU Medium PvE', type: 'modded', country: 'DE', typicalPlayers: 110, maxPlayers: 200, mapSize: 4000 },
+
+  // WarBandits — el límite de grupo va siempre en el nombre
+  { id: 'cat-warbandits-eu-3x-trio', name: 'WARBANDITS.GG EU 3X |Solo/Duo/Trio| LootX3', type: 'modded', country: 'DE', typicalPlayers: 650, maxPlayers: 650, mapSize: 4250 },
+  { id: 'cat-warbandits-eu-2x-duo', name: 'WARBANDITS.GG EU 2X |Solo/Duo| X2', type: 'modded', country: 'DE', typicalPlayers: 550, maxPlayers: 600, mapSize: 4250 },
+  { id: 'cat-warbandits-us-2x-trio', name: 'WARBANDITS.GG US 2X |Solo/Duo/Trio|', type: 'modded', country: 'US', typicalPlayers: 700, maxPlayers: 850, mapSize: 4500 },
+  { id: 'cat-warbandits-eu-5x-quad', name: 'WARBANDITS.GG EU 5X |Solo/Duo/Trio/Quad|', type: 'modded', country: 'DE', typicalPlayers: 400, maxPlayers: 500, mapSize: 4250 },
+  { id: 'cat-warbandits-eu-solo', name: 'WARBANDITS.GG EU 3X |Solo Only|', type: 'modded', country: 'DE', typicalPlayers: 300, maxPlayers: 400, mapSize: 3800 },
+  { id: 'cat-warbandits-au-2x', name: 'WARBANDITS.GG AU 2X |Solo/Duo/Trio|', type: 'modded', country: 'AU', typicalPlayers: 200, maxPlayers: 300, mapSize: 4000 },
+
+  // Werewolf Gaming — muy conocidos por sus servidores solo only
+  { id: 'cat-werewolf-eu-solo', name: 'WEREWOLF GAMING.CO 3x SOLO ONLY | No Clans/Teams', type: 'modded', country: 'DE', typicalPlayers: 250, maxPlayers: 300, mapSize: 3800 },
+  { id: 'cat-werewolf-eu-duo', name: 'WEREWOLF GAMING.CO 3x Solo/Duo', type: 'modded', country: 'DE', typicalPlayers: 220, maxPlayers: 300, mapSize: 4000 },
+  { id: 'cat-werewolf-eu-main', name: 'WEREWOLF GAMING.CO 3x EU Main', type: 'modded', country: 'DE', typicalPlayers: 250, maxPlayers: 350, mapSize: 4250 },
+  { id: 'cat-werewolf-us-solo', name: 'WEREWOLF GAMING.CO 3x US SOLO ONLY', type: 'modded', country: 'US', typicalPlayers: 180, maxPlayers: 250, mapSize: 3800 },
+
+  // Survivors.gg — cada servidor numerado tiene su propio día de wipe
+  { id: 'cat-survivors-1', name: 'Survivors.gg #1 [ 2x Solo/Duo/Trio/Quad ]', type: 'modded', country: 'DE', typicalPlayers: 300, maxPlayers: 350, mapSize: 4250 },
+  { id: 'cat-survivors-5', name: 'Survivors.gg #5 [ 2x Solo/Duo/Trio ]', type: 'modded', country: 'DE', typicalPlayers: 250, maxPlayers: 300, mapSize: 4000 },
+  { id: 'cat-survivors-6', name: 'Survivors.gg #6 [ 2x Solo/Duo/Trio/Quad ]', type: 'modded', country: 'DE', typicalPlayers: 240, maxPlayers: 300, mapSize: 4000 },
+  { id: 'cat-survivors-monthly', name: 'Survivors.gg - 2x Monthly [ Solo/Duo/Trio ] No BP Wipes', type: 'modded', country: 'DE', typicalPlayers: 200, maxPlayers: 300, mapSize: 4500 },
+
+  // Atlas Rust — más servidores de los que ya había
+  { id: 'cat-atlasrust-eu-trio', name: 'Atlas Rust EU 2x | Solo/Duo/Trio', type: 'modded', country: 'DE', typicalPlayers: 180, maxPlayers: 250, mapSize: 4000 },
+  { id: 'cat-atlasrust-eu-solo', name: 'Atlas Rust EU | Solo Only', type: 'modded', country: 'DE', typicalPlayers: 140, maxPlayers: 200, mapSize: 3500 },
+  { id: 'cat-atlasrust-us-main', name: 'Atlas Rust US Main', type: 'modded', country: 'US', typicalPlayers: 150, maxPlayers: 250, mapSize: 4000 },
+
+  // Otros con límite de grupo declarado en el nombre
+  { id: 'cat-rustoria-eu-duo', name: 'Rustoria.co - EU Duo', type: 'community', country: 'DE', typicalPlayers: 220, maxPlayers: 300, mapSize: 3800 },
+  { id: 'cat-moose-eu-trio', name: 'Rusty Moose |EU Trio|', type: 'modded', country: 'DE', typicalPlayers: 230, maxPlayers: 300, mapSize: 3800 },
+  { id: 'cat-picklerust-eu-solo', name: 'PickleRust EU Solo Only', type: 'modded', country: 'DE', typicalPlayers: 160, maxPlayers: 250, mapSize: 3500 },
 
   // Oficiales de Facepunch
   { id: 'cat-official-eu-main', name: '[EU] Facepunch Rust Official Main', type: 'official', country: 'DE', typicalPlayers: 250, maxPlayers: 300, mapSize: 4250 },

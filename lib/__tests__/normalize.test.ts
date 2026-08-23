@@ -81,8 +81,34 @@ describe('catálogo sin credenciales', () => {
     expect(servers.every((s) => s.nextWipeMs !== null)).toBe(true);
   });
 
-  it('todos van marcados como programado, nunca como confirmado', () => {
-    expect(servers.every((s) => s.confidence === 'programado')).toBe(true);
+  it('nunca se marca nada como confirmado: el catálogo no es el servidor', () => {
+    expect(servers.some((s) => s.confidence === 'confirmado')).toBe(false);
+  });
+
+  it('los calendarios verificados son programado y los demás estimado', () => {
+    expect(servers.every((s) => s.confidence === 'programado' || s.confidence === 'estimado')).toBe(
+      true,
+    );
+    // Tiene que haber de los dos: si no, o no se verifica nada o se verifica todo.
+    expect(servers.some((s) => s.confidence === 'programado')).toBe(true);
+    expect(servers.some((s) => s.confidence === 'estimado')).toBe(true);
+
+    const rustafied = servers.find((s) => s.name === 'Rustafied.com - EU Main')!;
+    expect(rustafied.confidence).toBe('programado');
+
+    const warbandits = servers.find((s) => s.community === 'WarBandits')!;
+    expect(warbandits.confidence).toBe('estimado');
+  });
+
+  it('deduce el tamaño de grupo del nombre', () => {
+    const wb = servers.find((s) => s.name.includes('EU 3X |Solo/Duo/Trio|'))!;
+    expect(wb.groupLimit).toBe(3);
+
+    const solo = servers.find((s) => s.name.includes('SOLO ONLY | No Clans'))!;
+    expect(solo.groupLimit).toBe(1);
+
+    const sinPista = servers.find((s) => s.name === 'Rustafied.com - EU Main')!;
+    expect(sinPista.groupLimit).toBeNull();
   });
 
   it('no se inventa ips', () => {

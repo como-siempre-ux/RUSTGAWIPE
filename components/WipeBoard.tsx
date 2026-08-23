@@ -22,7 +22,14 @@ type State =
   | { status: 'error'; message: string }
   | { status: 'ready'; data: WipesPayload };
 
-export function WipeBoard() {
+export function WipeBoard({
+  portada,
+  marca,
+}: {
+  /** Imagen de portada, renderizada en el servidor y pasada como prop. */
+  portada?: React.ReactNode;
+  marca?: React.ReactNode;
+}) {
   const [state, setState] = useState<State>({ status: 'loading' });
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [toast, setToast] = useState<string | null>(null);
@@ -68,14 +75,34 @@ export function WipeBoard() {
     [servers, filters, nowMs],
   );
 
+  const groupCounts = useMemo(() => {
+    const counts: Record<number, number> = {};
+    for (const s of servers) {
+      if (s.groupLimit !== null) counts[s.groupLimit] = (counts[s.groupLimit] ?? 0) + 1;
+    }
+    return counts;
+  }, [servers]);
+
   const copy = useCopyToClipboard(setToast);
   const dirty = isDirty(filters);
 
   return (
     <>
-      <ForcedWipeCountdown
-        targetMs={state.status === 'ready' ? state.data.nextForcedWipeMs : Date.now()}
-      />
+      {/*
+        Hero: marca arriba, y debajo countdown y portada en dos columnas. En
+        móvil la portada va primera, como una portada de verdad; el countdown
+        cae justo después, que sigue siendo lo que se viene a mirar.
+      */}
+      {marca}
+
+      <div className="grid items-center gap-4 px-4 pt-4 md:grid-cols-[1fr_minmax(0,38%)] md:gap-8">
+        <div className="order-last md:order-first md:px-0">
+          <ForcedWipeCountdown
+            targetMs={state.status === 'ready' ? state.data.nextForcedWipeMs : Date.now()}
+          />
+        </div>
+        <div className="order-first md:order-last">{portada}</div>
+      </div>
 
       <div className="rivets mx-4" aria-hidden />
 
@@ -89,6 +116,7 @@ export function WipeBoard() {
         <FilterBar
           filters={filters}
           regions={regions}
+          groupCounts={groupCounts}
           onChange={setFilters}
           resultCount={visible.length}
         />
@@ -136,6 +164,10 @@ function matches(s: RustServer, f: Filters, nowMs: number): boolean {
   if (f.region !== 'todas' && s.region !== f.region) return false;
   if (f.minMaxPlayers > 0 && (s.maxPlayers ?? 0) < f.minMaxPlayers) return false;
 
+  // Tope exacto. Los servidores donde no se ha podido deducir el límite
+  // (`null`) sólo salen con "cualquiera": no se cuelan como si fueran libres.
+  if (f.group !== -1 && s.groupLimit !== f.group) return false;
+
   if (f.query.trim()) {
     const q = f.query.trim().toLowerCase();
     const hay = `${s.name} ${s.community ?? ''} ${s.region ?? ''}`.toLowerCase();
@@ -157,6 +189,7 @@ function isDirty(f: Filters): boolean {
     f.window !== 'todos' ||
     f.region !== 'todas' ||
     f.minMaxPlayers > 0 ||
+    f.group !== -1 ||
     f.query.trim() !== ''
   );
 }

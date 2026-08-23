@@ -217,6 +217,52 @@ describe('calendarios publicados', () => {
     expect(new Date(nextWipeFromRule(rule, now)).toISOString()).toBe('2025-08-21T19:00:00.000Z');
   });
 
+  it('Survivors.gg #1 wipea lunes y jueves: gana el que caiga antes', () => {
+    const rule = matchCommunity('Survivors.gg #1 [ 2x Solo/Duo/Trio/Quad ]')!.rule;
+    expect(rule.weekdays).toEqual([1, 4]);
+    expect(rule.timeZone).toBe('Europe/Berlin');
+
+    // Martes 19 de agosto de 2025: el próximo de los dos es el jueves 21.
+    const martes = iso('2025-08-19T08:00:00.000Z');
+    // Agosto en Berlín es CEST (UTC+2): 14:00 local = 12:00 UTC.
+    expect(new Date(nextWipeFromRule(rule, martes)).toISOString()).toBe('2025-08-21T12:00:00.000Z');
+
+    // Viernes 22: ahora el próximo es el lunes 25.
+    const viernes = iso('2025-08-22T08:00:00.000Z');
+    expect(new Date(nextWipeFromRule(rule, viernes)).toISOString()).toBe('2025-08-25T12:00:00.000Z');
+  });
+
+  it('Survivors.gg #5 sólo wipea los viernes', () => {
+    const rule = matchCommunity('Survivors.gg #5 [ 2x Solo/Duo/Trio ]')!.rule;
+    expect(rule.weekdays).toBeUndefined();
+    expect(rule.weekday).toBe(5);
+  });
+
+  it('un calendario sin verificar se marca estimado, no programado', () => {
+    const rule = matchCommunity('WARBANDITS.GG EU 3X |Solo/Duo/Trio| LootX3')!.rule;
+    expect(rule.approximate).toBe(true);
+
+    const now = iso('2025-08-20T12:00:00.000Z');
+    const r = resolveNextWipe({ name: 'WARBANDITS.GG EU 3X |Solo/Duo/Trio|', rule }, now);
+    expect(r.confidence).toBe('estimado');
+    expect(r.explanation).toContain('sin hora confirmada');
+  });
+
+  it('un calendario verificado sigue siendo programado', () => {
+    const rule = matchCommunity('Rustafied.com - EU Main')!.rule;
+    expect(rule.approximate).toBeUndefined();
+
+    const now = iso('2025-08-20T12:00:00.000Z');
+    expect(resolveNextWipe({ name: 'Rustafied.com - EU Main', rule }, now).confidence).toBe(
+      'programado',
+    );
+  });
+
+  it('WarBandits wipea dos veces por semana', () => {
+    const rule = matchCommunity('WARBANDITS.GG US 2X |Solo/Duo/Trio|')!.rule;
+    expect(rule.weekdays).toEqual([1, 5]);
+  });
+
   it('un servidor desconocido no casa con ninguna comunidad', () => {
     expect(matchCommunity('Servidor de Pepe 10x')).toBeNull();
   });

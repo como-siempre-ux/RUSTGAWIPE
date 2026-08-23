@@ -24,10 +24,7 @@ export function ForcedWipeCountdown({ targetMs }: { targetMs: number }) {
   const absolute = new Date(targetMs);
 
   return (
-    <section
-      aria-label="cuenta atrás para el forced wipe"
-      className="px-4 pt-10 pb-8 sm:pt-14"
-    >
+    <section aria-label="cuenta atrás para el forced wipe" className="pb-6 pt-2">
       <p className="stencil text-oxide-bright">próximo forced wipe</p>
 
       <div

@@ -17,5 +17,8 @@ Thumbs.db
 npm-debug.log*
 yarn-error.log*
 
-# Material personal: no se publica salvo que se decida a mano.
-Imagenes/
+# Carpeta de originales: material de trabajo, no se publica.
+# Anclada a la raíz con la barra inicial: sin ella, en Windows (donde git no
+# distingue mayúsculas) esta regla también tapaba `public/imagenes/`, que sí
+# tiene que ir al repo porque es de donde Next sirve la portada.
+/Imagenes/

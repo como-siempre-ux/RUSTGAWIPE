@@ -30,11 +30,23 @@ export interface ScheduleRule {
   cadence: Cadence;
   /** 0 = domingo ... 6 = sábado. Irrelevante para `monthly`. */
   weekday: number;
+  /**
+   * Varios días de wipe en la misma semana, cuando la comunidad wipea más de
+   * una vez (Warbandits wipea lunes y viernes; Survivors.gg #1 hace fullwipe
+   * el jueves y map wipe el lunes). Si está, manda sobre `weekday`.
+   */
+  weekdays?: number[];
   hourLocal: number;
   minuteLocal?: number;
   timeZone: string;
   /** Días entre wipes cuando `cadence === 'custom'`. */
   intervalDays?: number;
+  /**
+   * El calendario no se ha podido verificar contra una fuente oficial: se
+   * conoce el ciclo pero no la hora exacta. Baja la confianza a `estimado`
+   * para no vender una suposición como un horario publicado.
+   */
+  approximate?: boolean;
   /** Descripción legible, se muestra en el tooltip. */
   human: string;
 }
@@ -47,6 +59,11 @@ export interface RustServer {
   connect: string | null;
   players: number | null;
   maxPlayers: number | null;
+  /**
+   * Tamaño máximo de grupo: `1` solo, `2` dúo… `0` sin límite declarado,
+   * `null` no se ha podido determinar. Sale del nombre del servidor.
+   */
+  groupLimit: number | null;
   /** ISO-3166 alpha-2, en mayúsculas. */
   country: string | null;
   region: string | null;

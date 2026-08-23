@@ -5,6 +5,7 @@
  */
 
 import { CATALOG_SERVERS, matchCommunity, regionLabel } from './catalog';
+import { detectGroupLimit } from './group-size';
 import type { RawServer } from './sources/battlemetrics';
 import type { RustServer, ServerType } from './types';
 import { CONFIDENCE_WEIGHT, resolveNextWipe } from './wipe-schedule';
@@ -59,6 +60,7 @@ export function normalizeServer(
     connect: raw.ip && raw.port ? `${raw.ip}:${raw.port}` : null,
     players: raw.players,
     maxPlayers: raw.maxPlayers,
+    groupLimit: detectGroupLimit(raw.name),
     country: raw.country ? raw.country.toUpperCase() : null,
     region: regionLabel(raw.name, raw.country),
     lastWipeMs: parseIso(raw.lastWipeIso),

@@ -115,23 +115,32 @@ export function nextWipeFromRule(rule: ScheduleRule, nowMs: number): number {
   const tz = rule.timeZone;
   const here = zonedParts(tz, nowMs);
 
-  // Primer candidato: el día objetivo de esta semana, a la hora local del wipe.
-  const deltaToTarget = (rule.weekday - here.weekday + 7) % 7;
-  let candidate = zonedWallTimeToUtc(
-    tz,
-    here.year,
-    here.month,
-    here.day + deltaToTarget,
-    rule.hourLocal,
-    rule.minuteLocal ?? 0,
-  );
+  // Una comunidad puede wipear varios días por semana: se prueban todos y
+  // gana el que caiga antes.
+  const targets = rule.weekdays?.length ? rule.weekdays : [rule.weekday];
 
-  let guard = 0;
-  while (candidate <= nowMs && guard++ < 60) {
-    candidate += stepDays * DAY_MS;
+  let soonest = Infinity;
+  for (const weekday of targets) {
+    // Primer candidato: ese día de esta semana, a la hora local del wipe.
+    const deltaToTarget = (weekday - here.weekday + 7) % 7;
+    let candidate = zonedWallTimeToUtc(
+      tz,
+      here.year,
+      here.month,
+      here.day + deltaToTarget,
+      rule.hourLocal,
+      rule.minuteLocal ?? 0,
+    );
+
+    let guard = 0;
+    while (candidate <= nowMs && guard++ < 60) {
+      candidate += stepDays * DAY_MS;
+    }
+
+    if (candidate < soonest) soonest = candidate;
   }
 
-  return Math.min(candidate, forced);
+  return Math.min(soonest, forced);
 }
 
 // ---------------------------------------------------------------------------
@@ -172,13 +181,16 @@ export function resolveNextWipe(input: ResolveInput, nowMs: number): WipeResolut
     };
   }
 
-  // 2. Calendario publicado de la comunidad.
+  // 2. Calendario de la comunidad. Si no está verificado contra una fuente
+  //    oficial se baja a `estimado`: se conoce el ciclo, no la hora exacta.
   if (input.rule) {
     return {
       nextWipeMs: nextWipeFromRule(input.rule, nowMs),
-      confidence: 'programado',
+      confidence: input.rule.approximate ? 'estimado' : 'programado',
       cadence: input.rule.cadence,
-      explanation: `calendario publicado de ${input.rule.community}: ${input.rule.human}.`,
+      explanation: input.rule.approximate
+        ? `ciclo conocido de ${input.rule.community}, sin hora confirmada: ${input.rule.human}.`
+        : `calendario publicado de ${input.rule.community}: ${input.rule.human}.`,
     };
   }
 

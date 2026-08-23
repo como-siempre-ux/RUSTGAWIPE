@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 
+import { groupLimitLabel } from '@/lib/group-size';
 import { HOUR_MS, formatRelative } from '@/lib/time';
 import type { RustServer, WipeConfidence } from '@/lib/types';
 
@@ -52,6 +53,7 @@ export function ServerCard({
 }) {
   const next = server.nextWipeMs;
   const urgent = next !== null && next - nowMs < 6 * HOUR_MS;
+  const groupLabel = groupLimitLabel(server.groupLimit);
 
   const absolute = useMemo(
     () =>
@@ -83,6 +85,11 @@ export function ServerCard({
             <span className={`stencil rounded-sm border px-1.5 py-0.5 ${TYPE_STYLE[server.type]}`}>
               {TYPE_LABEL[server.type]}
             </span>
+            {groupLabel && (
+              <span className="stencil rounded-sm border border-weld bg-weld/40 px-1.5 py-0.5 text-ash">
+                {groupLabel}
+              </span>
+            )}
             {server.community && (
               <span className="stencil text-ash/80">{server.community}</span>
             )}

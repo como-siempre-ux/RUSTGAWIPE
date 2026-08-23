@@ -4,11 +4,15 @@ import type { ServerType } from '@/lib/types';
 
 export type WindowKey = '6h' | '24h' | '48h' | '7d' | 'todos';
 
+/** `-1` = cualquiera. `0` = sin límite de grupo. `1..5` = tope exacto. */
+export type GroupKey = -1 | 0 | 1 | 2 | 3 | 4 | 5;
+
 export interface Filters {
   types: ServerType[];
   window: WindowKey;
   region: string;
   minMaxPlayers: number;
+  group: GroupKey;
   query: string;
 }
 
@@ -17,6 +21,7 @@ export const DEFAULT_FILTERS: Filters = {
   window: 'todos',
   region: 'todas',
   minMaxPlayers: 0,
+  group: -1,
   query: '',
 };
 
@@ -36,14 +41,30 @@ const WINDOWS: Array<{ key: WindowKey; label: string }> = [
 
 const PLAYER_STEPS = [0, 100, 200, 300];
 
+/**
+ * Tope exacto, no "hasta": quien busca trío quiere servidores de trío, no
+ * que le salgan también los de grupo libre. Es como filtra todo el mundo.
+ */
+const GROUPS: Array<{ key: GroupKey; label: string }> = [
+  { key: -1, label: 'cualquiera' },
+  { key: 1, label: 'solo' },
+  { key: 2, label: 'dúo' },
+  { key: 3, label: 'trío' },
+  { key: 4, label: 'cuarteto' },
+  { key: 0, label: 'sin límite' },
+];
+
 export function FilterBar({
   filters,
   regions,
+  groupCounts,
   onChange,
   resultCount,
 }: {
   filters: Filters;
   regions: string[];
+  /** Cuántos servidores hay de cada tamaño de grupo, sobre el total cargado. */
+  groupCounts: Record<number, number>;
   onChange: (next: Filters) => void;
   resultCount: number;
 }) {
@@ -115,6 +136,25 @@ export function FilterBar({
           </select>
         </Group>
 
+        <Group label="grupo">
+          {GROUPS.map((g) => {
+            // Sin servidores de ese tamaño, el chip se apaga en vez de llevar
+            // a una lista vacía. En modo catálogo pasa con "sin límite".
+            const disabled = g.key !== -1 && (groupCounts[g.key] ?? 0) === 0;
+            return (
+              <Chip
+                key={g.key}
+                active={filters.group === g.key}
+                disabled={disabled}
+                title={disabled ? 'ningún servidor cargado declara este tamaño' : undefined}
+                onClick={() => set('group', g.key)}
+              >
+                {g.label}
+              </Chip>
+            );
+          })}
+        </Group>
+
         <Group label="aforo mínimo">
           {PLAYER_STEPS.map((p) => (
             <Chip
@@ -145,22 +185,30 @@ function Chip({
   onClick,
   children,
   pressed = false,
+  disabled = false,
+  title,
 }: {
   active: boolean;
   onClick: () => void;
   children: React.ReactNode;
   pressed?: boolean;
+  disabled?: boolean;
+  title?: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
+      title={title}
       {...(pressed ? { 'aria-pressed': active } : {})}
       className={[
         'stencil rounded-sm border px-2 py-1 transition-colors',
-        active
-          ? 'border-oxide bg-oxide/15 text-oxide-bright'
-          : 'border-weld bg-hollow text-ash hover:text-bone',
+        disabled
+          ? 'cursor-not-allowed border-weld/50 bg-hollow text-ash/30'
+          : active
+            ? 'border-oxide bg-oxide/15 text-oxide-bright'
+            : 'border-weld bg-hollow text-ash hover:text-bone',
       ].join(' ')}
     >
       {children}

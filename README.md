@@ -69,13 +69,19 @@ direcciones**.
 
 Adivinar el ciclo de wipe leyendo el nombre del servidor funciona regular. Las comunidades
 grandes publican su calendario, así que para ellas se usa el calendario y no la heurística.
-Eso está en [`lib/catalog.ts`](lib/catalog.ts): Rustafied, Rusticated, Rusty Moose, Rustoria,
-Bloo Lagoon, Rustopia, PickleRust, RustEZ, Rustinity, Rust Factor, Vital Rust, Atlas Rust,
-Reddit Rust y los oficiales de Facepunch.
+Eso está en [`lib/catalog.ts`](lib/catalog.ts), con 17 comunidades: Rustafied, Rusticated,
+Rusty Moose, Rustoria, Bloo Lagoon, WarBandits, Werewolf Gaming, Survivors.gg, Rustopia,
+PickleRust, RustEZ, Rustinity, Rust Factor, Vital Rust, Atlas Rust, Reddit Rust y los oficiales
+de Facepunch.
 
 Cada entrada lleva `sourceUrl` y `verified` con la fecha en que se comprobó contra la web
 oficial. **Cuando una comunidad cambia su calendario, esto se queda viejo**, y por eso la UI
 nunca lo enseña como confirmado.
+
+Las que no se pudieron contrastar contra una fuente oficial llevan `approximate: true`: se
+conoce el ciclo pero no la hora exacta, así que bajan a `estimado` en vez de venderse como
+horario publicado. WarBandits es el caso claro — su web lista fechas de wipe pero ni la hora ni
+el día fijo.
 
 La app distingue cuatro niveles de fiabilidad, visibles en cada fila con su explicación en el
 tooltip:
@@ -86,6 +92,19 @@ tooltip:
 | `programado` | calendario publicado de la comunidad |
 | `estimado` | último wipe + ciclo deducido del nombre |
 | `desconocido` | no hay datos; va al final de la lista, no se oculta |
+
+### Tamaño de grupo
+
+Ni BattleMetrics ni Steam dan el límite de grupo como campo. En Rust la convención es meterlo en
+el nombre ("Solo/Duo/Trio", "4 Max", "No Limit"), así que se deduce de ahí en
+[`lib/group-size.ts`](lib/group-size.ts). Dos detalles que importan:
+
+- De un rango se coge **el mayor**: "Solo/Duo/Trio" permite grupos de hasta 3, no de 1.
+- `null` (no se pudo deducir) **no** es lo mismo que `0` (sin límite declarado). Los `null` sólo
+  salen con el filtro en "cualquiera", para no colarlos como si fueran de grupo libre.
+
+El filtro de grupo usa tope exacto, no "hasta": quien busca trío quiere servidores de trío. Los
+chips sin ningún servidor detrás se desactivan en vez de llevar a una lista vacía.
 
 ### Actualizar un horario
 
@@ -108,7 +127,7 @@ Todo el cálculo vive en [`lib/wipe-schedule.ts`](lib/wipe-schedule.ts) y ningun
   enero.
 
 ```bash
-npm test        # 56 tests
+npm test        # 77 tests
 npm run typecheck
 ```
 
@@ -127,8 +146,11 @@ lib/
   normalize.ts          fuente externa -> modelo propio
   time.ts               zonas horarias sin dependencias
   types.ts              tipos + esquemas Zod
-components/             countdown, filtros, tarjeta de servidor
+  group-size.ts         tamaño máximo de grupo deducido del nombre
+components/             portada, countdown, filtros, tarjeta de servidor
 fixtures/               respuestas de la API (ver fixtures/README.md)
+Imagenes/               carpeta de originales (no se publica, ver más abajo)
+public/imagenes/        estáticos servidos por Next: portada.png
 ```
 
 - Sin base de datos.
@@ -147,6 +169,21 @@ callado.
 
 Mobile-first, foco de teclado visible, `prefers-reduced-motion` respetado, y estados de carga,
 error y lista vacía.
+
+### La portada
+
+El original está en la carpeta **`Imagenes/`** del proyecto, que es material de trabajo y no se
+publica (está en `.gitignore`). Lo que se sirve es la copia en
+**`public/imagenes/portada.png`**, porque Next sólo sirve estáticos desde `public/`.
+
+Para cambiarla, deja la nueva imagen en `Imagenes/` y cópiala encima:
+
+```bash
+copy Imagenes\tu-imagen.png public\imagenes\portada.png
+```
+
+Va al lado del countdown, no de fondo: puesta detrás había que taparla con tanto degradado para
+que las cifras se leyeran que no se veía la imagen.
 
 ## Qué no hay (y es a propósito)
 
