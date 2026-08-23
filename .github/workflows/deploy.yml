@@ -88,8 +88,18 @@ jobs:
         env:
           STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
         run: |
-          if [ -n "$STEAM_API_KEY" ] && grep -rq "$STEAM_API_KEY" out/; then
-            echo "✗ La clave de Steam aparece en out/. No se publica."
+          if [ -z "$STEAM_API_KEY" ]; then
+            echo "Sin clave configurada: nada que comprobar."
+            exit 0
+          fi
+          # `grep -l` sólo lista los ficheros. El valor de la clave no se
+          # imprime nunca, y GitHub lo enmascararía igualmente.
+          AFECTADOS=$(grep -rl "$STEAM_API_KEY" out/ || true)
+          if [ -n "$AFECTADOS" ]; then
+            echo "✗ La clave de Steam aparece en estos ficheros de out/:"
+            echo "$AFECTADOS"
+            echo ""
+            echo "No se publica nada."
             exit 1
           fi
           echo "✓ Ninguna credencial en out/."
