@@ -40,13 +40,30 @@ Así que la app tiene **tres fuentes** detrás de la misma interfaz, y usa la pr
 
 ### La opción recomendada: Steam
 
-La clave es gratuita e instantánea en https://steamcommunity.com/dev/apikey.
+La clave es gratuita en https://steamcommunity.com/dev/apikey (en "Domain Name" vale cualquier
+cosa, por ejemplo `localhost`). Pégala en `.env.local`:
 
 ```bash
-cp .env.example .env.local
-# pega la clave en STEAM_API_KEY
-npm run dev
+STEAM_API_KEY=la-clave-que-te-han-dado
 ```
+
+Y comprueba que sirve antes de arrancar nada:
+
+```bash
+npm run check:steam
+```
+
+Ese comando va contra el endpoint de verdad y dice cuántos servidores llegan, cuántos traen la
+etiqueta `born` y cuáles son los cinco con más gente. Sirve para separar dos preguntas que si no
+se mezclan: "¿mi clave sirve?" y "¿la app está rota?". Si algo falla, explica qué y cómo
+arreglarlo.
+
+**La clave es del servidor, no de cada visitante.** Vive en `.env.local`, sólo se lee en módulos
+`server-only` y no aparece en ningún bundle del cliente. Si algún día despliegas esto, una sola
+clave da servicio a todo el mundo que entre: nadie más necesita la suya. Y con `revalidate = 300`
+el servidor llama a Steam como mucho unas 288 veces al día, tenga una visita o cien mil.
+
+Quien abra la web sin que haya clave configurada tampoco se queda sin nada: cae al catálogo.
 
 El truco: Rust mete sus etiquetas en el campo `gametype` de Steam, y una de ellas es
 `born<unix>`, que es la fecha del último wipe. El parser está en

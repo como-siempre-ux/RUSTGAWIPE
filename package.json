@@ -10,7 +10,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "check:steam": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-steam.mts"
   },
   "dependencies": {
     "next": "15.5.4",
