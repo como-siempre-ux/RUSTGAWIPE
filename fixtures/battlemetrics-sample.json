@@ -1,0 +1,71 @@
+{
+  "_comment": "MUESTRA SINTETICA. No es una captura real: la API devuelve 403 sin suscripcion (ver battlemetrics-403-response.json). Escrita a partir de la forma documentada del recurso 'server' para documentar que campos espera el parser y cuales faltan a menudo.",
+  "data": [
+    {
+      "type": "server",
+      "id": "1234567",
+      "attributes": {
+        "id": "1234567",
+        "name": "Rustafied.com - EU Main",
+        "address": null,
+        "ip": "203.0.113.10",
+        "port": 28015,
+        "players": 312,
+        "maxPlayers": 350,
+        "rank": 4,
+        "location": [8.68, 50.11],
+        "status": "online",
+        "country": "DE",
+        "details": {
+          "rust_type": "community",
+          "rust_last_wipe": "2026-08-20T14:00:00.000Z",
+          "rust_world_size": 4250,
+          "rust_world_seed": 1849302,
+          "rust_url": "https://www.rustafied.com",
+          "rust_maps": { "seed": 1849302, "size": 4250 },
+          "rust_description": "Weekly wipes, Thursday 3pm UK.",
+          "rust_headerimage": "https://example.invalid/header.png"
+        }
+      }
+    },
+    {
+      "type": "server",
+      "id": "7654321",
+      "attributes": {
+        "id": "7654321",
+        "name": "[EU] Facepunch Rust Official Main",
+        "ip": "203.0.113.20",
+        "port": 28015,
+        "players": 241,
+        "maxPlayers": 300,
+        "status": "online",
+        "country": "GB",
+        "details": {
+          "rust_type": "official",
+          "rust_last_wipe": "2026-08-06T19:00:00.000Z",
+          "rust_next_wipe": "2026-09-03T19:00:00.000Z",
+          "rust_world_size": 4250
+        }
+      }
+    },
+    {
+      "_comment": "Caso habitual: sin rust_next_wipe, sin rust_last_wipe y sin datos de mapa. El parser tiene que aguantarlo y marcarlo 'desconocido'.",
+      "type": "server",
+      "id": "9999999",
+      "attributes": {
+        "id": "9999999",
+        "name": "Servidor sin metadatos",
+        "ip": "203.0.113.30",
+        "port": 28015,
+        "players": 12,
+        "maxPlayers": 100,
+        "status": "online",
+        "country": null,
+        "details": {}
+      }
+    }
+  ],
+  "links": {
+    "next": "https://api.battlemetrics.com/servers?filter%5Bgame%5D=rust&page%5Bsize%5D=100&page%5Bkey%5D=EJEMPLO&sort=-players"
+  }
+}
