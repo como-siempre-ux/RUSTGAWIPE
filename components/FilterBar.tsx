@@ -7,9 +7,13 @@ export type WindowKey = '6h' | '24h' | '48h' | '7d' | 'todos';
 /** `-1` = cualquiera. `0` = sin límite de grupo. `1..5` = tope exacto. */
 export type GroupKey = -1 | 0 | 1 | 2 | 3 | 4 | 5;
 
+/** Ventana hacia atrás: servidores que acaban de wipear. */
+export type WipedKey = 'cualquiera' | '24h' | '48h';
+
 export interface Filters {
   types: ServerType[];
   window: WindowKey;
+  wiped: WipedKey;
   region: string;
   minMaxPlayers: number;
   group: GroupKey;
@@ -19,6 +23,7 @@ export interface Filters {
 export const DEFAULT_FILTERS: Filters = {
   types: [],
   window: 'todos',
+  wiped: 'cualquiera',
   region: 'todas',
   minMaxPlayers: 0,
   group: -1,
@@ -37,6 +42,16 @@ const WINDOWS: Array<{ key: WindowKey; label: string }> = [
   { key: '48h', label: '48h' },
   { key: '7d', label: '7 días' },
   { key: 'todos', label: 'todos' },
+];
+
+/**
+ * Mirando hacia atrás: mapa recién estrenado. Es el otro momento en que se
+ * entra a un servidor, además de "está a punto de wipear".
+ */
+const WIPED: Array<{ key: WipedKey; label: string }> = [
+  { key: 'cualquiera', label: 'cualquiera' },
+  { key: '24h', label: 'últimas 24h' },
+  { key: '48h', label: 'últimas 48h' },
 ];
 
 const PLAYER_STEPS = [0, 100, 200, 300];
@@ -102,6 +117,7 @@ export function FilterBar({
               key={t.key}
               active={filters.types.includes(t.key)}
               onClick={() => toggleType(t.key)}
+              group="tipo"
               pressed
             >
               {t.label}
@@ -111,7 +127,25 @@ export function FilterBar({
 
         <Group label="wipea en">
           {WINDOWS.map((w) => (
-            <Chip key={w.key} active={filters.window === w.key} onClick={() => set('window', w.key)}>
+            <Chip
+              key={w.key}
+              group="wipea en"
+              active={filters.window === w.key}
+              onClick={() => set('window', w.key)}
+            >
+              {w.label}
+            </Chip>
+          ))}
+        </Group>
+
+        <Group label="ya wipeó hace">
+          {WIPED.map((w) => (
+            <Chip
+              key={w.key}
+              group="ya wipeó hace"
+              active={filters.wiped === w.key}
+              onClick={() => set('wiped', w.key)}
+            >
               {w.label}
             </Chip>
           ))}
@@ -144,6 +178,7 @@ export function FilterBar({
             return (
               <Chip
                 key={g.key}
+                group="tamaño de grupo"
                 active={filters.group === g.key}
                 disabled={disabled}
                 title={disabled ? 'ningún servidor cargado declara este tamaño' : undefined}
@@ -159,6 +194,7 @@ export function FilterBar({
           {PLAYER_STEPS.map((p) => (
             <Chip
               key={p}
+              group="aforo mínimo"
               active={filters.minMaxPlayers === p}
               onClick={() => set('minMaxPlayers', p)}
             >
@@ -169,6 +205,11 @@ export function FilterBar({
       </div>
     </div>
   );
+}
+
+/** Los chips llevan texto plano, así que basta con esto para el aria-label. */
+function childrenToText(children: React.ReactNode): string {
+  return typeof children === 'string' || typeof children === 'number' ? String(children) : '';
 }
 
 function Group({ label, children }: { label: string; children: React.ReactNode }) {
@@ -184,6 +225,7 @@ function Chip({
   active,
   onClick,
   children,
+  group,
   pressed = false,
   disabled = false,
   title,
@@ -191,6 +233,12 @@ function Chip({
   active: boolean;
   onClick: () => void;
   children: React.ReactNode;
+  /**
+   * Nombre del grupo al que pertenece el chip. Hay tres chips que se llaman
+   * "cualquiera"; en pantalla se distinguen por la etiqueta de su grupo, pero
+   * un lector de pantalla sólo oiría "cualquiera" tres veces.
+   */
+  group?: string;
   pressed?: boolean;
   disabled?: boolean;
   title?: string;
@@ -201,6 +249,7 @@ function Chip({
       onClick={onClick}
       disabled={disabled}
       title={title}
+      aria-label={group ? `${group}: ${childrenToText(children)}` : undefined}
       {...(pressed ? { 'aria-pressed': active } : {})}
       className={[
         'stencil rounded-sm border px-2 py-1 transition-colors',

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { CATALOG_SERVERS, COMMUNITIES } from '../catalog';
 import { catalogAsServers, normalizeAll, sortServers } from '../normalize';
 import type { RawServer } from '../sources/battlemetrics';
 
@@ -100,6 +101,29 @@ describe('catálogo sin credenciales', () => {
     expect(warbandits.confidence).toBe('estimado');
   });
 
+  it('todos traen último wipe calculado y en el pasado', () => {
+    expect(servers.every((s) => s.lastWipeMs !== null)).toBe(true);
+    expect(servers.every((s) => s.lastWipeMs! <= NOW)).toBe(true);
+    // Ninguno viene de una fuente real, así que todos van marcados.
+    expect(servers.every((s) => s.lastWipeIsDerived)).toBe(true);
+  });
+
+  it('el último wipe siempre es anterior al próximo', () => {
+    const malos = servers
+      .filter((s) => s.lastWipeMs! >= s.nextWipeMs!)
+      .map((s) => s.name);
+    expect(malos).toEqual([]);
+  });
+
+  it('hay servidores de cada tamaño de grupo, para que los filtros sirvan', () => {
+    const cuenta = (n: number) => servers.filter((s) => s.groupLimit === n).length;
+    expect(cuenta(1)).toBeGreaterThanOrEqual(4); // solo
+    expect(cuenta(2)).toBeGreaterThanOrEqual(15); // dúo
+    expect(cuenta(3)).toBeGreaterThanOrEqual(10); // trío
+    expect(cuenta(4)).toBeGreaterThanOrEqual(4); // cuarteto
+    expect(cuenta(0)).toBeGreaterThanOrEqual(1); // sin límite
+  });
+
   it('deduce el tamaño de grupo del nombre', () => {
     const wb = servers.find((s) => s.name.includes('EU 3X |Solo/Duo/Trio|'))!;
     expect(wb.groupLimit).toBe(3);
@@ -122,6 +146,23 @@ describe('catálogo sin credenciales', () => {
   });
 
   it('cada servidor del catálogo casa con su comunidad', () => {
-    expect(servers.every((s) => s.community !== null)).toBe(true);
+    const huerfanos = servers.filter((s) => s.community === null).map((s) => s.name);
+    expect(huerfanos).toEqual([]);
+  });
+
+  it('no hay ids ni nombres repetidos', () => {
+    const ids = CATALOG_SERVERS.map((s) => s.id);
+    expect(new Set(ids).size).toBe(ids.length);
+
+    const nombres = CATALOG_SERVERS.map((s) => s.name);
+    expect(new Set(nombres).size).toBe(nombres.length);
+  });
+
+  it('todas las comunidades del catálogo tienen al menos un servidor', () => {
+    const conServidor = new Set(servers.map((s) => s.community));
+    const sinServidor = COMMUNITIES.map((c) => c.name).filter((n) => !conServidor.has(n));
+    // Facepunch y Reddit sí los tienen; si alguna otra se queda sin servidor
+    // es que la regex de `match` no casa con los nombres que hemos puesto.
+    expect(sinServidor).toEqual([]);
   });
 });

@@ -69,10 +69,16 @@ direcciones**.
 
 Adivinar el ciclo de wipe leyendo el nombre del servidor funciona regular. Las comunidades
 grandes publican su calendario, así que para ellas se usa el calendario y no la heurística.
-Eso está en [`lib/catalog.ts`](lib/catalog.ts), con 17 comunidades: Rustafied, Rusticated,
-Rusty Moose, Rustoria, Bloo Lagoon, WarBandits, Werewolf Gaming, Survivors.gg, Rustopia,
-PickleRust, RustEZ, Rustinity, Rust Factor, Vital Rust, Atlas Rust, Reddit Rust y los oficiales
-de Facepunch.
+Eso está en [`lib/catalog.ts`](lib/catalog.ts): **145 servidores de 18 comunidades** —
+Rustafied, Rusticated, Rusty Moose, Rustoria, Atlas, WarBandits, Survivors.gg, Werewolf Gaming,
+HollowServers.co, Magic Rust, Rustopia, Bloo Lagoon, PickleRust, RustEZ, Rustinity, Rust Factor,
+Vital Rust y los oficiales de Facepunch.
+
+Los nombres y los ciclos salen de las listas reales de cada organización, no de suposiciones: los
+13 servidores de Survivors.gg con su par de días cada uno, los 15 de Atlas con su ciclo por rate,
+los 12 de Rustopia. Hay tests que comprueban que ningún servidor del catálogo se queda huérfano y
+que ninguna comunidad se queda sin servidores, que es como se detecta que una regex de `match` ha
+dejado de casar.
 
 Cada entrada lleva `sourceUrl` y `verified` con la fecha en que se comprobó contra la web
 oficial. **Cuando una comunidad cambia su calendario, esto se queda viejo**, y por eso la UI
@@ -106,6 +112,36 @@ el nombre ("Solo/Duo/Trio", "4 Max", "No Limit"), así que se deduce de ahí en
 El filtro de grupo usa tope exacto, no "hasta": quien busca trío quiere servidores de trío. Los
 chips sin ningún servidor detrás se desactivan en vez de llevar a una lista vacía.
 
+### El último wipe
+
+El catálogo no observa nada en vivo, pero el último wipe **sí se puede calcular**: es la misma
+cuenta del próximo wipe, mirando hacia atrás. Está en `previousWipeFromRule`.
+
+Un detalle que importa: un servidor de comunidad wipea también en el forced wipe, así que el
+último wipe es el más reciente entre "el último hueco de su calendario" y "el forced wipe
+anterior". Sin eso, un servidor de wipe semanal en jueves diría que wipeó el jueves a las 14:00
+cuando en realidad wipeó ese mismo jueves a las 19:00 con el force update.
+
+En la interfaz, un `~` delante avisa de que la fecha está calculada y no observada. Cuando la
+fuente da el dato real, ese gana y el `~` desaparece.
+
+Sobre eso va el filtro **"ya wipeó hace"**: últimas 24h o 48h, para encontrar mapa recién
+estrenado. Los servidores sin fecha de último wipe quedan fuera de ese filtro en vez de colarse.
+
+### Qué se actualiza y cuándo
+
+Nada de esto es una fecha guardada: el próximo y el último wipe se recalculan con la hora de cada
+petición.
+
+- El route handler cachea 5 minutos (`revalidate = 300`).
+- El cliente vuelve a pedir la lista cada 5 minutos, y también al volver a la pestaña. Ese
+  refresco no muestra el skeleton: cambiar la lista por esqueletos cada cinco minutos molesta más
+  de lo que informa.
+- Los tiempos relativos ("wipea en 3h 20m") se recalculan en cliente cada 30 segundos.
+
+Lo que sí se queda viejo es el catálogo en sí, cuando una comunidad cambia su calendario. Por eso
+cada entrada lleva `verified` y nada se marca como confirmado.
+
 ### Actualizar un horario
 
 Edita la entrada en `COMMUNITIES` dentro de [`lib/catalog.ts`](lib/catalog.ts), sube la fecha de
@@ -127,7 +163,7 @@ Todo el cálculo vive en [`lib/wipe-schedule.ts`](lib/wipe-schedule.ts) y ningun
   enero.
 
 ```bash
-npm test        # 77 tests
+npm test        # 95 tests
 npm run typecheck
 ```
 

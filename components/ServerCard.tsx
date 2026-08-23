@@ -53,6 +53,8 @@ export function ServerCard({
 }) {
   const next = server.nextWipeMs;
   const urgent = next !== null && next - nowMs < 6 * HOUR_MS;
+  /** Wipeó hace menos de un día: mapa recién estrenado. */
+  const fresh = server.lastWipeMs !== null && nowMs - server.lastWipeMs < 24 * HOUR_MS;
   const groupLabel = groupLimitLabel(server.groupLimit);
 
   const absolute = useMemo(
@@ -119,7 +121,23 @@ export function ServerCard({
             </Fact>
 
             <Fact label="último wipe">
-              {server.lastWipeMs ? formatRelative(server.lastWipeMs, nowMs) : 'sin datos'}
+              {server.lastWipeMs ? (
+                <span
+                  className={fresh ? 'text-oxide-bright' : undefined}
+                  title={
+                    server.lastWipeIsDerived
+                      ? 'calculado con el calendario de la comunidad, no observado'
+                      : 'fecha real del último wipe'
+                  }
+                >
+                  {/* El "~" avisa de que la fecha está calculada, no observada. */}
+                  {server.lastWipeIsDerived && <span className="text-ash/60">~</span>}
+                  {formatRelative(server.lastWipeMs, nowMs)}
+                  {fresh && <span className="stencil ml-1.5 text-oxide-bright">mapa nuevo</span>}
+                </span>
+              ) : (
+                'sin datos'
+              )}
             </Fact>
 
             {server.mapSize && (

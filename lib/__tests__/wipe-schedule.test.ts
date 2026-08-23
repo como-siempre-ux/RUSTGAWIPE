@@ -9,6 +9,7 @@ import {
   nextForcedWipe,
   nextWipeFromRule,
   previousForcedWipe,
+  previousWipeFromRule,
   resolveNextWipe,
 } from '../wipe-schedule';
 
@@ -139,6 +140,96 @@ describe('resolución por servidor', () => {
   });
 });
 
+describe('último wipe calculado hacia atrás', () => {
+  it('semanal: devuelve la última vez que tocó ese día', () => {
+    const rule = matchCommunity('Rustafied.com - EU Main')!.rule; // jueves 15:00 Londres
+    // Sábado 23 de agosto de 2025: el jueves anterior fue el 21.
+    const sabado = iso('2025-08-23T10:00:00.000Z');
+    expect(new Date(previousWipeFromRule(rule, sabado)).toISOString()).toBe(
+      '2025-08-21T14:00:00.000Z',
+    );
+  });
+
+  it('el último wipe siempre queda en el pasado, nunca en el futuro', () => {
+    const now = iso('2025-08-23T10:00:00.000Z');
+    for (const nombre of [
+      'Rustafied.com - EU Main',
+      'Rustafied.com - EU Monday',
+      'Survivors.gg #1 [ 2x Solo/Duo/Trio/Quad ]',
+      'Atlas - EU 5x | No BPs | Kits',
+      '[US] Bloo Lagoon Main | Bi-weekly',
+      'Rustopia.gg - EU Medium',
+    ]) {
+      const rule = matchCommunity(nombre)!.rule;
+      expect(previousWipeFromRule(rule, now), nombre).toBeLessThanOrEqual(now);
+    }
+  });
+
+  it('el último wipe nunca es posterior al próximo', () => {
+    const now = iso('2025-08-23T10:00:00.000Z');
+    for (const nombre of [
+      'Rustafied.com - EU Main',
+      'WARBANDITS.GG EU 3X |Solo/Duo/Trio| LootX3',
+      'HollowServers.co 2x Solo/Duo/Trio | 50% Upkeep',
+      'Magic Rust #13 — Vanilla 2x',
+      'Atlas - EU 10x | No BPs | Kits | Shop',
+    ]) {
+      const rule = matchCommunity(nombre)!.rule;
+      expect(previousWipeFromRule(rule, now), nombre).toBeLessThan(nextWipeFromRule(rule, now));
+    }
+  });
+
+  it('mensual: el último wipe fue el forced wipe anterior', () => {
+    const rule = matchCommunity('Rustafied.com - EU Long - Large')!.rule;
+    const now = iso('2025-08-23T10:00:00.000Z');
+    expect(new Date(previousWipeFromRule(rule, now)).toISOString()).toBe('2025-08-07T19:00:00.000Z');
+  });
+
+  it('un forced wipe reciente gana al hueco semanal del calendario', () => {
+    // Viernes 8 de agosto de 2025: el forced wipe fue el jueves 7 a las 19:00
+    // UTC, más tarde que el hueco de las 14:00 de ese mismo jueves.
+    const rule = matchCommunity('Rustafied.com - EU Main')!.rule;
+    const viernes = iso('2025-08-08T10:00:00.000Z');
+    expect(new Date(previousWipeFromRule(rule, viernes)).toISOString()).toBe(
+      '2025-08-07T19:00:00.000Z',
+    );
+  });
+
+  it('varios días por semana: coge el más reciente de los dos', () => {
+    const rule = matchCommunity('Survivors.gg #1 [ 2x Solo/Duo/Trio/Quad ]')!.rule; // lun y jue
+    // Sábado 23 de agosto: el más reciente de los dos es el jueves 21.
+    const sabado = iso('2025-08-23T10:00:00.000Z');
+    expect(new Date(previousWipeFromRule(rule, sabado)).toISOString()).toBe(
+      '2025-08-21T12:00:00.000Z',
+    );
+  });
+
+  it('la resolución marca el último wipe como calculado, no observado', () => {
+    const rule = matchCommunity('Rustafied.com - EU Main')!.rule;
+    const now = iso('2025-08-23T10:00:00.000Z');
+
+    const sinDato = resolveNextWipe({ name: 'Rustafied.com - EU Main', rule }, now);
+    expect(sinDato.lastWipeIsDerived).toBe(true);
+    expect(sinDato.lastWipeMs).not.toBeNull();
+
+    // Si la fuente da el dato real, ese gana y deja de ser calculado.
+    const real = iso('2025-08-22T09:00:00.000Z');
+    const conDato = resolveNextWipe(
+      { name: 'Rustafied.com - EU Main', rule, lastWipeMs: real },
+      now,
+    );
+    expect(conDato.lastWipeIsDerived).toBe(false);
+    expect(conDato.lastWipeMs).toBe(real);
+  });
+
+  it('sin calendario y sin dato, no se inventa un último wipe', () => {
+    const now = iso('2025-08-23T10:00:00.000Z');
+    const r = resolveNextWipe({ name: 'Servidor de Pepe 10x' }, now);
+    expect(r.lastWipeMs).toBeNull();
+    expect(r.lastWipeIsDerived).toBe(false);
+  });
+});
+
 describe('calendarios publicados', () => {
   it('Rustafied EU Main: jueves 15:00 hora de Londres', () => {
     const match = matchCommunity('Rustafied.com - EU Main');
@@ -261,6 +352,52 @@ describe('calendarios publicados', () => {
   it('WarBandits wipea dos veces por semana', () => {
     const rule = matchCommunity('WARBANDITS.GG US 2X |Solo/Duo/Trio|')!.rule;
     expect(rule.weekdays).toEqual([1, 5]);
+  });
+
+  it('HollowServers wipea lunes y viernes, y sus Monthly van al forced wipe', () => {
+    const normal = matchCommunity('HollowServers.co 2x Solo/Duo/Trio | 50% Upkeep')!.rule;
+    expect(normal.weekdays).toEqual([1, 5]);
+
+    const mensual = matchCommunity('HollowServers.co - 2x Monthly Solo/Duo/Trio/Quad')!.rule;
+    expect(mensual.cadence).toBe('monthly');
+
+    const now = iso('2025-08-20T12:00:00.000Z');
+    expect(nextWipeFromRule(mensual, now)).toBe(iso('2025-09-04T19:00:00.000Z'));
+  });
+
+  it('Atlas: cada rate tiene sus días', () => {
+    expect(matchCommunity('Atlas - EU 10x | No BPs | Kits | Shop')!.rule.weekdays).toEqual([1, 5]);
+    expect(matchCommunity('Atlas - EU 5x | No BPs | Kits')!.rule.weekdays).toEqual([3, 6]);
+    expect(matchCommunity('Atlas - EU 3x | No BPs | Mondays')!.rule.weekday).toBe(1);
+    expect(matchCommunity('Atlas - EU 2X Medium | Vanilla+ | No BP Wipes')!.rule.cadence).toBe(
+      'biweekly',
+    );
+    expect(matchCommunity('Atlas - EU Long | Vanilla | No BP wipes')!.rule.cadence).toBe('monthly');
+  });
+
+  it('Atlas: "Monthly" gana aunque el nombre lleve también un rate', () => {
+    // "Atlas - EU 2X Monthly" lleva 2X; no debe caer en la regla de 10x/5x.
+    const r = matchCommunity('Atlas - EU 2X Monthly | Vanilla+ | No BP Wipes')!.rule;
+    expect(r.cadence).toBe('monthly');
+  });
+
+  it('Rustopia: Main semanal, Medium/Large/Small al forced wipe', () => {
+    expect(matchCommunity('Rustopia.gg - EU Main')!.rule.cadence).toBe('weekly');
+    expect(matchCommunity('Rustopia.gg - EU Main')!.rule.weekday).toBe(4);
+    expect(matchCommunity('Rustopia.gg - EU Mondays | Premium')!.rule.weekday).toBe(1);
+    expect(matchCommunity('Rustopia.gg - EU Medium')!.rule.cadence).toBe('monthly');
+    expect(matchCommunity('Rustopia.gg - US Large')!.rule.cadence).toBe('monthly');
+    expect(matchCommunity('Rustopia.gg - US Small')!.rule.cadence).toBe('monthly');
+  });
+
+  it('Magic Rust va en hora de Moscú y sus Long son mensuales', () => {
+    const corto = matchCommunity('Magic Rust #13 — Vanilla 2x')!.rule;
+    expect(corto.timeZone).toBe('Europe/Moscow');
+    expect(corto.weekdays).toEqual([1, 5]);
+
+    expect(matchCommunity('Magic Rust — Long | Классика x1')!.rule.cadence).toBe('monthly');
+    expect(matchCommunity('Magic Rust #27 — Vanilla 2x (Monthly)')!.rule.cadence).toBe('monthly');
+    expect(matchCommunity('Magic Rust #22 — Vanilla 2x (Biweekly)')!.rule.cadence).toBe('biweekly');
   });
 
   it('un servidor desconocido no casa con ninguna comunidad', () => {

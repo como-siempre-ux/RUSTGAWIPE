@@ -5,7 +5,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DAY_MS, HOUR_MS } from '@/lib/time';
 import type { RustServer, WipesPayload } from '@/lib/types';
 
-import { DEFAULT_FILTERS, FilterBar, type Filters, type WindowKey } from './FilterBar';
+import {
+  DEFAULT_FILTERS,
+  FilterBar,
+  type Filters,
+  type WindowKey,
+  type WipedKey,
+} from './FilterBar';
 import { ForcedWipeCountdown } from './ForcedWipeCountdown';
 import { ServerCard } from './ServerCard';
 
@@ -16,6 +22,15 @@ const WINDOW_MS: Record<WindowKey, number | null> = {
   '7d': 7 * DAY_MS,
   todos: null,
 };
+
+const WIPED_MS: Record<WipedKey, number | null> = {
+  cualquiera: null,
+  '24h': 24 * HOUR_MS,
+  '48h': 48 * HOUR_MS,
+};
+
+/** Cada cuánto se vuelve a pedir la lista, para que no se quede vieja. */
+const REFRESH_MS = 5 * 60_000;
 
 type State =
   | { status: 'loading' }
@@ -41,8 +56,13 @@ export function WipeBoard({
     return () => clearInterval(id);
   }, []);
 
-  const load = useCallback(async () => {
-    setState({ status: 'loading' });
+  /**
+   * `silencioso` evita el skeleton al refrescar en segundo plano: si la lista
+   * ya está pintada, cambiarla por esqueletos cada cinco minutos molesta más
+   * de lo que informa.
+   */
+  const load = useCallback(async (silencioso = false) => {
+    if (!silencioso) setState({ status: 'loading' });
     try {
       const res = await fetch('/api/wipes');
       const json = await res.json();
@@ -61,6 +81,24 @@ export function WipeBoard({
 
   useEffect(() => {
     void load();
+  }, [load]);
+
+  /**
+   * La lista se recalcula en el servidor con la hora de cada petición, así que
+   * con la pestaña abierta se queda vieja: los wipes van pasando. Se refresca
+   * cada cinco minutos, y también al volver a la pestaña, que es cuando de
+   * verdad importa que los datos estén al día.
+   */
+  useEffect(() => {
+    const id = setInterval(() => void load(true), REFRESH_MS);
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void load(true);
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, [load]);
 
   const servers = state.status === 'ready' ? state.data.servers : [];
@@ -180,6 +218,14 @@ function matches(s: RustServer, f: Filters, nowMs: number): boolean {
     if (s.nextWipeMs - nowMs > win) return false;
   }
 
+  // Recién wipeado: mapa nuevo. Sin fecha de último wipe no puede afirmarse,
+  // así que esos quedan fuera en vez de colarse por defecto.
+  const back = WIPED_MS[f.wiped];
+  if (back !== null) {
+    if (s.lastWipeMs === null) return false;
+    if (nowMs - s.lastWipeMs > back) return false;
+  }
+
   return true;
 }
 
@@ -187,6 +233,7 @@ function isDirty(f: Filters): boolean {
   return (
     f.types.length > 0 ||
     f.window !== 'todos' ||
+    f.wiped !== 'cualquiera' ||
     f.region !== 'todas' ||
     f.minMaxPlayers > 0 ||
     f.group !== -1 ||

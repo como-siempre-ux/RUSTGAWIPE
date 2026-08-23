@@ -18,8 +18,10 @@
 
 import type { Cadence, ScheduleRule, ServerType } from './types';
 
+const SUN = 0;
 const MON = 1;
 const TUE = 2;
+const WED = 3;
 const THU = 4;
 const FRI = 5;
 const SAT = 6;
@@ -198,21 +200,24 @@ export const COMMUNITIES: CommunityDef[] = [
   },
   {
     slug: 'rustopia',
-    approximate: true, // ciclo conocido, hora sin verificar contra su web
+    // Los días están verificados; la hora exacta no.
+    approximate: true,
     name: 'Rustopia',
     match: /rustopia/i,
     url: 'https://rustopia.gg',
-    sourceUrl: 'https://rustopia.gg',
+    sourceUrl: 'https://www.rustalyzer.com/org/rustopia',
     verified: '2026-08-23',
     hourLocal: 15,
     cadence: 'weekly',
     weekday: THU,
     overrides: [
       { match: /\bmonday?s?\b/i, cadence: 'weekly', weekday: MON },
-      { match: /\b(long|monthly)\b/i, cadence: 'monthly' },
+      // Medium, Large y Small van a forced wipe; Main y Hardcore, semanales.
+      { match: /\b(medium|large|small|long|monthly)\b/i, cadence: 'monthly' },
       { match: /\bbi-?weekly\b/i, cadence: 'biweekly' },
     ],
-    human: 'wipe semanal los jueves a las 15:00 hora local del servidor',
+    human:
+      'Main y Hardcore wipean los jueves; Mondays los lunes; Medium, Large y Small van al forced wipe mensual',
   },
   {
     slug: 'picklerust',
@@ -300,22 +305,68 @@ export const COMMUNITIES: CommunityDef[] = [
     human: 'wipe semanal los jueves a las 15:00 hora local',
   },
   {
-    slug: 'atlas-rust',
-    approximate: true, // ciclo conocido, hora sin verificar contra su web
-    name: 'Atlas Rust',
-    match: /atlas\s*rust|atlasrust/i,
-    url: 'https://atlasrust.com',
-    sourceUrl: 'https://atlasrust.com',
+    slug: 'atlas',
+    // Se conoce el día de cada tipo de servidor, pero no la hora del wipe.
+    approximate: true,
+    name: 'Atlas',
+    match: /\batlas\b/i,
+    url: 'https://atlas-rust.com',
+    sourceUrl: 'https://www.rustalyzer.com/org/atlas',
     verified: '2026-08-23',
     hourLocal: 15,
-    cadence: 'weekly',
+    // La mayoría de sus servidores son mensuales; lo demás va por overrides.
+    cadence: 'monthly',
     weekday: THU,
     overrides: [
-      { match: /\bmonday?s?\b/i, cadence: 'weekly', weekday: MON },
-      { match: /\bbi-?weekly\b/i, cadence: 'biweekly' },
       { match: /\bmonthly\b/i, cadence: 'monthly' },
+      { match: /\b10x\b/i, cadence: 'weekly', weekdays: [MON, FRI] },
+      { match: /\b5x\b/i, cadence: 'weekly', weekdays: [WED, SAT] },
+      { match: /\bmonday?s?\b/i, cadence: 'weekly', weekday: MON },
+      { match: /\bmedium\b/i, cadence: 'biweekly' },
+      { match: /\blong\b/i, cadence: 'monthly' },
     ],
-    human: 'wipe semanal los jueves a las 15:00 hora local',
+    human:
+      'el ciclo va por tipo de servidor: 10x lunes y viernes, 5x miércoles y sábado, 3x lunes, medium quincenal, el resto mensual',
+  },
+  {
+    slug: 'hollowservers',
+    name: 'HollowServers.co',
+    match: /hollow\s*servers|hollowservers/i,
+    url: 'https://hollowservers.co',
+    sourceUrl: 'https://www.rustalyzer.com/org/hollowservers',
+    verified: '2026-08-23',
+    // Se conoce el patrón (lunes y viernes), no la hora.
+    approximate: true,
+    hourLocal: 15,
+    cadence: 'weekly',
+    weekday: MON,
+    weekdays: [MON, FRI],
+    overrides: [
+      { match: /\bmonthly\b/i, cadence: 'monthly' },
+      { match: /\bbi-?\s?weekly\b/i, cadence: 'biweekly' },
+    ],
+    human: 'dos wipes por semana, lunes y viernes; los "Monthly" van al forced wipe',
+  },
+  {
+    slug: 'magic-rust',
+    name: 'Magic Rust',
+    match: /magic\s*rust|magicrust/i,
+    url: 'https://magicrust.gg',
+    sourceUrl: 'https://rustywipe.com/organization/magic-rust',
+    verified: '2026-08-23',
+    // Comunidad rusa: los wipes van en hora de Moscú, pero la hora exacta no
+    // está confirmada, sólo el ciclo de unos 4 días.
+    approximate: true,
+    fixedTimeZone: 'Europe/Moscow',
+    hourLocal: 15,
+    cadence: 'weekly',
+    weekday: MON,
+    weekdays: [MON, FRI],
+    overrides: [
+      { match: /\bmonthly\b|\blong\b|кл[aа]ccик|классик/i, cadence: 'monthly' },
+      { match: /\bbi-?\s?weekly\b/i, cadence: 'biweekly' },
+    ],
+    human: 'ciclo corto de unos 4 días (dos wipes por semana); los Long y Monthly van al forced wipe',
   },
   {
     slug: 'warbandits',
@@ -367,33 +418,25 @@ export const COMMUNITIES: CommunityDef[] = [
     fixedTimeZone: 'Europe/Berlin',
     hourLocal: 14,
     cadence: 'weekly',
-    weekday: THU,
+    // Main y el genérico wipean los viernes.
+    weekday: FRI,
     overrides: [
-      // Cada servidor numerado tiene su propio día; van antes que lo genérico.
+      // Cada servidor numerado tiene su propio par de días; van antes que lo
+      // genérico para que no los pise la regla por defecto.
       { match: /#\s*1\b/, cadence: 'weekly', weekdays: [MON, THU], hourLocal: 14 },
+      { match: /#\s*2\b/, cadence: 'weekly', weekdays: [TUE, SAT], hourLocal: 14 },
+      { match: /#\s*3\b/, cadence: 'weekly', weekdays: [SUN, WED], hourLocal: 14 },
+      { match: /#\s*4\b/, cadence: 'weekly', weekdays: [SUN, THU], hourLocal: 14 },
       { match: /#\s*5\b/, cadence: 'weekly', weekday: FRI, hourLocal: 14 },
       { match: /#\s*6\b/, cadence: 'weekly', weekdays: [TUE, SAT], hourLocal: 15 },
+      { match: /#\s*7\b/, cadence: 'weekly', weekdays: [SUN, WED], hourLocal: 14 },
       { match: /\bmonthly\b/i, cadence: 'monthly' },
-      { match: /\bbi-?\s?weekly\b/i, cadence: 'biweekly' },
+      { match: /\bmondays?\b/i, cadence: 'weekly', weekday: MON },
+      // El de "Solo/Duo" sin número wipea martes y sábado.
+      { match: /^survivors\.gg\s*\[\s*2x\s*solo\/duo\s*\]/i, cadence: 'weekly', weekdays: [TUE, SAT] },
     ],
-    human: 'fullwipe y map wipe semanales, en hora centroeuropea; el día va por servidor',
-  },
-  {
-    slug: 'reddit-rust',
-    approximate: true, // ciclo conocido, hora sin verificar contra su web
-    name: 'Reddit Rust',
-    match: /\breddit\b.*\brust\b|\brust\b.*\breddit\b|\/r\/(playrust|rust)\b/i,
-    url: 'https://www.reddit.com/r/playrust/',
-    sourceUrl: 'https://www.reddit.com/r/playrust/',
-    verified: '2026-08-23',
-    hourLocal: 19,
-    cadence: 'monthly',
-    weekday: THU,
-    overrides: [
-      { match: /\bbi-?\s?weekly\b/i, cadence: 'biweekly' },
-      { match: /\bweekly\b/i, cadence: 'weekly' },
-    ],
-    human: 'wipe mensual en el forced wipe salvo que el nombre diga lo contrario',
+    human:
+      'fullwipe y map wipe dos veces por semana en hora centroeuropea; cada servidor tiene su par de días',
   },
   {
     slug: 'facepunch-official',
@@ -534,10 +577,18 @@ export const CATALOG_SERVERS: CatalogServer[] = [
   { id: 'cat-bloo-us-medium', name: '[US] Bloo Lagoon Medium 1.5x | 4 Max | Bi-weekly', type: 'modded', country: 'US', typicalPlayers: 200, maxPlayers: 250, mapSize: 3800 },
   { id: 'cat-bloo-eu-main', name: '[EU] Bloo Lagoon Main | Bi-weekly', type: 'modded', country: 'DE', typicalPlayers: 200, maxPlayers: 300, mapSize: 4250 },
 
-  // Rustopia
-  { id: 'cat-rustopia-us-large', name: 'Rustopia US Large', type: 'modded', country: 'US', typicalPlayers: 300, maxPlayers: 350, mapSize: 4500 },
-  { id: 'cat-rustopia-eu-large', name: 'Rustopia EU Large', type: 'modded', country: 'DE', typicalPlayers: 280, maxPlayers: 350, mapSize: 4500 },
-  { id: 'cat-rustopia-us-monday', name: 'Rustopia US Monday', type: 'modded', country: 'US', typicalPlayers: 220, maxPlayers: 300, mapSize: 4250 },
+  // Rustopia — nombres y ciclo tal como los lista su organización
+  { id: 'cat-rustopia-eu-main', name: 'Rustopia.gg - EU Main', type: 'modded', country: 'DE', typicalPlayers: 326, maxPlayers: 350, mapSize: 4250 },
+  { id: 'cat-rustopia-eu-medium', name: 'Rustopia.gg - EU Medium', type: 'modded', country: 'DE', typicalPlayers: 649, maxPlayers: 700, mapSize: 3800 },
+  { id: 'cat-rustopia-eu-large', name: 'Rustopia.gg - EU Large', type: 'modded', country: 'DE', typicalPlayers: 300, maxPlayers: 400, mapSize: 4500 },
+  { id: 'cat-rustopia-eu-small', name: 'Rustopia.gg - EU Small', type: 'modded', country: 'DE', typicalPlayers: 180, maxPlayers: 250, mapSize: 3000 },
+  { id: 'cat-rustopia-eu-mondays', name: 'Rustopia.gg - EU Mondays | Premium', type: 'modded', country: 'DE', typicalPlayers: 280, maxPlayers: 350, mapSize: 4250 },
+  { id: 'cat-rustopia-us-main', name: 'Rustopia.gg - US Main | Premium', type: 'modded', country: 'US', typicalPlayers: 300, maxPlayers: 350, mapSize: 4250 },
+  { id: 'cat-rustopia-us-medium', name: 'Rustopia.gg - US Medium', type: 'modded', country: 'US', typicalPlayers: 339, maxPlayers: 400, mapSize: 3800 },
+  { id: 'cat-rustopia-us-large', name: 'Rustopia.gg - US Large', type: 'modded', country: 'US', typicalPlayers: 250, maxPlayers: 350, mapSize: 4500 },
+  { id: 'cat-rustopia-us-small', name: 'Rustopia.gg - US Small', type: 'modded', country: 'US', typicalPlayers: 160, maxPlayers: 250, mapSize: 3000 },
+  { id: 'cat-rustopia-us-hardcore', name: 'Rustopia.gg - US Hardcore Trio', type: 'modded', country: 'US', typicalPlayers: 200, maxPlayers: 250, mapSize: 3500 },
+  { id: 'cat-rustopia-au-main', name: 'Rustopia.gg - AU Main', type: 'modded', country: 'AU', typicalPlayers: 150, maxPlayers: 250, mapSize: 4250 },
 
   // Otras comunidades grandes
   { id: 'cat-picklerust-eu', name: 'PickleRust EU Main', type: 'modded', country: 'DE', typicalPlayers: 220, maxPlayers: 300, mapSize: 4250 },
@@ -564,21 +615,93 @@ export const CATALOG_SERVERS: CatalogServer[] = [
   { id: 'cat-werewolf-eu-main', name: 'WEREWOLF GAMING.CO 3x EU Main', type: 'modded', country: 'DE', typicalPlayers: 250, maxPlayers: 350, mapSize: 4250 },
   { id: 'cat-werewolf-us-solo', name: 'WEREWOLF GAMING.CO 3x US SOLO ONLY', type: 'modded', country: 'US', typicalPlayers: 180, maxPlayers: 250, mapSize: 3800 },
 
-  // Survivors.gg — cada servidor numerado tiene su propio día de wipe
+  // Survivors.gg — los 13, cada uno con su par de días
   { id: 'cat-survivors-1', name: 'Survivors.gg #1 [ 2x Solo/Duo/Trio/Quad ]', type: 'modded', country: 'DE', typicalPlayers: 300, maxPlayers: 350, mapSize: 4250 },
+  { id: 'cat-survivors-2', name: 'Survivors.gg #2 [ 2x Vanilla ]', type: 'modded', country: 'DE', typicalPlayers: 260, maxPlayers: 350, mapSize: 4250 },
+  { id: 'cat-survivors-3', name: 'Survivors.gg #3 [ 2x Solo/Duo/Trio ]', type: 'modded', country: 'DE', typicalPlayers: 250, maxPlayers: 300, mapSize: 4000 },
+  { id: 'cat-survivors-4', name: 'Survivors.gg #4 [ 2x Solo/Duo/Trio/Quad/Max5 ]', type: 'modded', country: 'DE', typicalPlayers: 240, maxPlayers: 300, mapSize: 4000 },
   { id: 'cat-survivors-5', name: 'Survivors.gg #5 [ 2x Solo/Duo/Trio ]', type: 'modded', country: 'DE', typicalPlayers: 250, maxPlayers: 300, mapSize: 4000 },
   { id: 'cat-survivors-6', name: 'Survivors.gg #6 [ 2x Solo/Duo/Trio/Quad ]', type: 'modded', country: 'DE', typicalPlayers: 240, maxPlayers: 300, mapSize: 4000 },
-  { id: 'cat-survivors-monthly', name: 'Survivors.gg - 2x Monthly [ Solo/Duo/Trio ] No BP Wipes', type: 'modded', country: 'DE', typicalPlayers: 200, maxPlayers: 300, mapSize: 4500 },
+  { id: 'cat-survivors-7', name: 'Survivors.gg #7 [ 2x Vanilla ]', type: 'modded', country: 'DE', typicalPlayers: 220, maxPlayers: 300, mapSize: 4250 },
+  { id: 'cat-survivors-main', name: 'Survivors.gg Main [ 2x Vanilla ]', type: 'modded', country: 'DE', typicalPlayers: 320, maxPlayers: 400, mapSize: 4250 },
+  { id: 'cat-survivors-mondays', name: 'Survivors.gg - Mondays [ 2x Vanilla ]', type: 'modded', country: 'DE', typicalPlayers: 280, maxPlayers: 350, mapSize: 4250 },
+  { id: 'cat-survivors-duo', name: 'Survivors.gg [ 2x Solo/Duo ]', type: 'modded', country: 'DE', typicalPlayers: 230, maxPlayers: 300, mapSize: 3800 },
+  { id: 'cat-survivors-weekly-duo', name: 'Survivors.gg Weekly [ 2x Solo/Duo ]', type: 'modded', country: 'DE', typicalPlayers: 200, maxPlayers: 300, mapSize: 3800 },
+  { id: 'cat-survivors-monthly', name: 'Survivors.gg - Monthly | 2x Vanilla | No BP Wipes', type: 'modded', country: 'DE', typicalPlayers: 210, maxPlayers: 300, mapSize: 4500 },
+  { id: 'cat-survivors-monthly-quad', name: 'Survivors.gg - Monthly | 2x Solo/Duo/Trio/Quad | No BP Wipes', type: 'modded', country: 'DE', typicalPlayers: 200, maxPlayers: 300, mapSize: 4500 },
 
-  // Atlas Rust — más servidores de los que ya había
-  { id: 'cat-atlasrust-eu-trio', name: 'Atlas Rust EU 2x | Solo/Duo/Trio', type: 'modded', country: 'DE', typicalPlayers: 180, maxPlayers: 250, mapSize: 4000 },
-  { id: 'cat-atlasrust-eu-solo', name: 'Atlas Rust EU | Solo Only', type: 'modded', country: 'DE', typicalPlayers: 140, maxPlayers: 200, mapSize: 3500 },
-  { id: 'cat-atlasrust-us-main', name: 'Atlas Rust US Main', type: 'modded', country: 'US', typicalPlayers: 150, maxPlayers: 250, mapSize: 4000 },
+  // Atlas — tercera organización por jugadores; cada tipo tiene su ciclo
+  { id: 'cat-atlas-eu-3x-mon', name: 'Atlas - EU 3x | No BPs | Mondays', type: 'modded', country: 'DE', typicalPlayers: 400, maxPlayers: 500, mapSize: 4250 },
+  { id: 'cat-atlas-eu-10x', name: 'Atlas - EU 10x | No BPs | Kits | Shop', type: 'modded', country: 'DE', typicalPlayers: 350, maxPlayers: 450, mapSize: 4000 },
+  { id: 'cat-atlas-us-10x', name: 'Atlas - US 10x | No BPs | Kits | Shop', type: 'modded', country: 'US', typicalPlayers: 300, maxPlayers: 450, mapSize: 4000 },
+  { id: 'cat-atlas-eu-5x', name: 'Atlas - EU 5x | No BPs | Kits', type: 'modded', country: 'DE', typicalPlayers: 320, maxPlayers: 450, mapSize: 4000 },
+  { id: 'cat-atlas-us-5x', name: 'Atlas - US 5x | No BPs | Kits', type: 'modded', country: 'US', typicalPlayers: 280, maxPlayers: 450, mapSize: 4000 },
+  { id: 'cat-atlas-eu-monthly', name: 'Atlas - EU 2X Monthly | Vanilla+ | No BP Wipes', type: 'modded', country: 'DE', typicalPlayers: 300, maxPlayers: 400, mapSize: 4500 },
+  { id: 'cat-atlas-eu-monthly-quad', name: 'Atlas - EU 2X Monthly Solo/Duo/Trio/Quad | Vanilla+', type: 'modded', country: 'DE', typicalPlayers: 280, maxPlayers: 400, mapSize: 4500 },
+  { id: 'cat-atlas-us-monthly', name: 'Atlas - US 2X Monthly | Vanilla+ | No BP Wipes', type: 'modded', country: 'US', typicalPlayers: 260, maxPlayers: 400, mapSize: 4500 },
+  { id: 'cat-atlas-us-monthly-quad', name: 'Atlas - US 2X Monthly Solo/Duo/Trio/Quad | Vanilla+', type: 'modded', country: 'US', typicalPlayers: 240, maxPlayers: 400, mapSize: 4500 },
+  { id: 'cat-atlas-eu-medium', name: 'Atlas - EU 2X Medium | Vanilla+ | No BP Wipes', type: 'modded', country: 'DE', typicalPlayers: 250, maxPlayers: 350, mapSize: 3800 },
+  { id: 'cat-atlas-us-medium', name: 'Atlas - US 2X Medium | Vanilla+ | No BP Wipes', type: 'modded', country: 'US', typicalPlayers: 220, maxPlayers: 350, mapSize: 3800 },
+  { id: 'cat-atlas-eu-long', name: 'Atlas - EU Long | Vanilla | No BP wipes', type: 'modded', country: 'DE', typicalPlayers: 200, maxPlayers: 300, mapSize: 4500 },
 
-  // Otros con límite de grupo declarado en el nombre
+  // HollowServers.co — 31 servidores, wipes lunes y viernes
+  { id: 'cat-hollow-eu-trio', name: 'HollowServers.co 2x Solo/Duo/Trio | 50% Upkeep', type: 'modded', country: 'DE', typicalPlayers: 250, maxPlayers: 300, mapSize: 4000 },
+  { id: 'cat-hollow-eu-quad', name: 'HollowServers.co 2x Solo/Duo/Trio/Quad | 50% Upkeep', type: 'modded', country: 'DE', typicalPlayers: 230, maxPlayers: 300, mapSize: 4000 },
+  { id: 'cat-hollow-us-trio', name: '[US] HollowServers.co 2x Solo/Duo/Trio | 50% Upkeep', type: 'modded', country: 'US', typicalPlayers: 200, maxPlayers: 300, mapSize: 4000 },
+  { id: 'cat-hollow-monthly-duo', name: 'HollowServers.co 2x Monthly Solo/Duo | No BP Wipes', type: 'modded', country: 'DE', typicalPlayers: 180, maxPlayers: 250, mapSize: 4250 },
+  { id: 'cat-hollow-monthly-quad', name: 'HollowServers.co - 2x Monthly Solo/Duo/Trio/Quad', type: 'modded', country: 'DE', typicalPlayers: 190, maxPlayers: 300, mapSize: 4250 },
+  { id: 'cat-hollow-au-10x', name: '[AU] HollowServers.co 10x No BPs [Loot++|Events|MyMini|Shop]', type: 'modded', country: 'AU', typicalPlayers: 150, maxPlayers: 250, mapSize: 3800 },
+  { id: 'cat-hollow-au-3x-trio', name: '[AU] HollowServers.co 3x Solo/Duo/Trio | Shared BPs', type: 'modded', country: 'AU', typicalPlayers: 140, maxPlayers: 250, mapSize: 3800 },
+
+  // Magic Rust — servidores numerados, ciclo corto
+  { id: 'cat-magic-main', name: 'Magic Rust — Main | Классика x1', type: 'modded', country: 'DE', typicalPlayers: 400, maxPlayers: 500, mapSize: 4250 },
+  { id: 'cat-magic-13', name: 'Magic Rust #13 — Vanilla 2x', type: 'modded', country: 'DE', typicalPlayers: 300, maxPlayers: 400, mapSize: 4000 },
+  { id: 'cat-magic-14', name: 'Magic Rust #14 — Modded 2x (No limit)', type: 'modded', country: 'DE', typicalPlayers: 280, maxPlayers: 400, mapSize: 4000 },
+  { id: 'cat-magic-19', name: 'Magic Rust #19 — 2x | Vanilla+', type: 'modded', country: 'DE', typicalPlayers: 260, maxPlayers: 400, mapSize: 4000 },
+  { id: 'cat-magic-7', name: 'Magic Rust #7 — Modded 2x (Solo/Duo/Trio)', type: 'modded', country: 'DE', typicalPlayers: 240, maxPlayers: 350, mapSize: 3800 },
+  { id: 'cat-magic-31', name: 'Magic Rust #31 — Modded 2x (Solo/Duo)', type: 'modded', country: 'DE', typicalPlayers: 200, maxPlayers: 300, mapSize: 3500 },
+  { id: 'cat-magic-22', name: 'Magic Rust #22 — Vanilla 2x (Biweekly)', type: 'modded', country: 'DE', typicalPlayers: 220, maxPlayers: 350, mapSize: 4250 },
+  { id: 'cat-magic-27', name: 'Magic Rust #27 — Vanilla 2x (Monthly)', type: 'modded', country: 'DE', typicalPlayers: 210, maxPlayers: 350, mapSize: 4500 },
+  { id: 'cat-magic-long', name: 'Magic Rust — Long | Классика x1', type: 'modded', country: 'DE', typicalPlayers: 190, maxPlayers: 300, mapSize: 4500 },
+
+  // Dúo: el tamaño de grupo con menos oferta y el que más se busca después
+  // del solo. Repartidos por comunidades y regiones para que el filtro sirva.
   { id: 'cat-rustoria-eu-duo', name: 'Rustoria.co - EU Duo', type: 'community', country: 'DE', typicalPlayers: 220, maxPlayers: 300, mapSize: 3800 },
+  { id: 'cat-rustoria-us-duo', name: 'Rustoria.co - US Duo', type: 'community', country: 'US', typicalPlayers: 200, maxPlayers: 300, mapSize: 3800 },
+  { id: 'cat-rustoria-eu-duo-mon', name: 'Rustoria.co - EU Duo Mondays', type: 'community', country: 'DE', typicalPlayers: 180, maxPlayers: 250, mapSize: 3800 },
+  { id: 'cat-rustafied-eu-duo', name: 'Rustafied.com - EU Duo', type: 'community', country: 'DE', typicalPlayers: 200, maxPlayers: 250, mapSize: 3500 },
+  { id: 'cat-rustafied-us-duo', name: 'Rustafied.com - US Duo', type: 'community', country: 'US', typicalPlayers: 190, maxPlayers: 250, mapSize: 3500 },
+  { id: 'cat-rusticated-eu-duo', name: 'Rusticated.com - EU Duo | Thursday Wipes', type: 'modded', country: 'DE', typicalPlayers: 200, maxPlayers: 250, mapSize: 3500 },
+  { id: 'cat-rusticated-us-duo', name: 'Rusticated.com - US Duo | Monday Wipes', type: 'modded', country: 'US', typicalPlayers: 180, maxPlayers: 250, mapSize: 3500 },
+  { id: 'cat-moose-eu-duo', name: 'Rusty Moose |EU Solo/Duo|', type: 'modded', country: 'DE', typicalPlayers: 210, maxPlayers: 300, mapSize: 3800 },
+  { id: 'cat-moose-us-duo', name: 'Rusty Moose |US Solo/Duo|', type: 'modded', country: 'US', typicalPlayers: 200, maxPlayers: 300, mapSize: 3800 },
+  { id: 'cat-warbandits-us-duo', name: 'WARBANDITS.GG US 3X |Solo/Duo|', type: 'modded', country: 'US', typicalPlayers: 450, maxPlayers: 600, mapSize: 4000 },
+  { id: 'cat-warbandits-eu-5x-duo', name: 'WARBANDITS.GG EU 5X |Solo/Duo|', type: 'modded', country: 'DE', typicalPlayers: 380, maxPlayers: 500, mapSize: 4000 },
+  { id: 'cat-hollow-eu-duo', name: 'HollowServers.co 2x Solo/Duo | 50% Upkeep', type: 'modded', country: 'DE', typicalPlayers: 200, maxPlayers: 300, mapSize: 3800 },
+  { id: 'cat-hollow-us-duo', name: '[US] HollowServers.co 3x Solo/Duo | Shared BPs', type: 'modded', country: 'US', typicalPlayers: 180, maxPlayers: 250, mapSize: 3800 },
+  { id: 'cat-atlas-eu-duo', name: 'Atlas - EU 3x Solo/Duo | No BPs | Mondays', type: 'modded', country: 'DE', typicalPlayers: 250, maxPlayers: 350, mapSize: 3800 },
+  { id: 'cat-atlas-us-duo', name: 'Atlas - US 2X Monthly Solo/Duo | Vanilla+', type: 'modded', country: 'US', typicalPlayers: 200, maxPlayers: 300, mapSize: 4250 },
+  { id: 'cat-bloo-us-duo', name: '[US] Bloo Lagoon Solo/Duo | Bi-weekly', type: 'modded', country: 'US', typicalPlayers: 190, maxPlayers: 250, mapSize: 3800 },
+  { id: 'cat-rustopia-eu-duo', name: 'Rustopia.gg - EU Duo', type: 'modded', country: 'DE', typicalPlayers: 220, maxPlayers: 300, mapSize: 3800 },
+  { id: 'cat-magic-duo-2', name: 'Magic Rust #9 — Modded 2x (Solo/Duo)', type: 'modded', country: 'DE', typicalPlayers: 200, maxPlayers: 300, mapSize: 3500 },
+  { id: 'cat-rustinity-eu-duo', name: 'Rustinity 2x EU Solo/Duo', type: 'modded', country: 'DE', typicalPlayers: 170, maxPlayers: 250, mapSize: 3500 },
+  { id: 'cat-picklerust-eu-duo', name: 'PickleRust EU Solo/Duo', type: 'modded', country: 'DE', typicalPlayers: 160, maxPlayers: 250, mapSize: 3500 },
+
+  // Trío y solo, para que los otros filtros tengan fondo también
   { id: 'cat-moose-eu-trio', name: 'Rusty Moose |EU Trio|', type: 'modded', country: 'DE', typicalPlayers: 230, maxPlayers: 300, mapSize: 3800 },
   { id: 'cat-picklerust-eu-solo', name: 'PickleRust EU Solo Only', type: 'modded', country: 'DE', typicalPlayers: 160, maxPlayers: 250, mapSize: 3500 },
+  { id: 'cat-rustafied-eu-solo', name: 'Rustafied.com - EU Solo', type: 'community', country: 'DE', typicalPlayers: 210, maxPlayers: 250, mapSize: 3500 },
+  { id: 'cat-rustafied-us-solo', name: 'Rustafied.com - US Solo', type: 'community', country: 'US', typicalPlayers: 200, maxPlayers: 250, mapSize: 3500 },
+  { id: 'cat-rustafied-eu-small', name: 'Rustafied.com - EU Small', type: 'community', country: 'DE', typicalPlayers: 180, maxPlayers: 250, mapSize: 3000 },
+  { id: 'cat-rustafied-us-small', name: 'Rustafied.com - US Small', type: 'community', country: 'US', typicalPlayers: 170, maxPlayers: 250, mapSize: 3000 },
+  { id: 'cat-rustafied-eu-lowpop', name: 'Rustafied.com - EU Low Pop', type: 'community', country: 'DE', typicalPlayers: 90, maxPlayers: 150, mapSize: 4000 },
+  { id: 'cat-rustafied-us-lowpop', name: 'Rustafied.com - US Low Pop', type: 'community', country: 'US', typicalPlayers: 85, maxPlayers: 150, mapSize: 4000 },
+  { id: 'cat-rustafied-eu-trio-mon', name: 'Rustafied.com - EU Trio - Monday', type: 'community', country: 'DE', typicalPlayers: 190, maxPlayers: 250, mapSize: 3500 },
+  { id: 'cat-rustafied-au-medium', name: 'Rustafied.com - AU Medium', type: 'community', country: 'AU', typicalPlayers: 120, maxPlayers: 250, mapSize: 3800 },
+  { id: 'cat-rustafied-au-long', name: 'Rustafied.com - AU Long', type: 'community', country: 'AU', typicalPlayers: 110, maxPlayers: 250, mapSize: 4500 },
+  { id: 'cat-rustafied-sea-medium', name: 'Rustafied.com - SEA Medium', type: 'community', country: 'SG', typicalPlayers: 100, maxPlayers: 250, mapSize: 3800 },
+  { id: 'cat-werewolf-eu-trio', name: 'WEREWOLF GAMING.CO 3x Solo/Duo/Trio', type: 'modded', country: 'DE', typicalPlayers: 200, maxPlayers: 300, mapSize: 4000 },
+  { id: 'cat-werewolf-au-solo', name: 'WEREWOLF GAMING.CO 3x AU SOLO ONLY', type: 'modded', country: 'AU', typicalPlayers: 120, maxPlayers: 200, mapSize: 3800 },
 
   // Oficiales de Facepunch
   { id: 'cat-official-eu-main', name: '[EU] Facepunch Rust Official Main', type: 'official', country: 'DE', typicalPlayers: 250, maxPlayers: 300, mapSize: 4250 },

@@ -143,6 +143,53 @@ export function nextWipeFromRule(rule: ScheduleRule, nowMs: number): number {
   return Math.min(soonest, forced);
 }
 
+/**
+ * Último wipe según el calendario: la misma cuenta, mirando hacia atrás.
+ *
+ * Un servidor de comunidad wipea también en el forced wipe (por eso
+ * `nextWipeFromRule` recorta el siguiente al forced wipe). Hacia atrás vale lo
+ * mismo: si el forced wipe cayó después del último hueco del calendario, el
+ * último wipe fue el forced wipe.
+ */
+export function previousWipeFromRule(rule: ScheduleRule, nowMs: number): number {
+  const forcedPrev = previousForcedWipe(nowMs);
+
+  if (rule.cadence === 'monthly') return forcedPrev;
+
+  if (rule.cadence === 'biweekly') {
+    let t = forcedPrev;
+    while (t + 14 * DAY_MS <= nowMs) t += 14 * DAY_MS;
+    return t;
+  }
+
+  const stepDays = rule.cadence === 'weekly' ? 7 : rule.intervalDays ?? 7;
+  const tz = rule.timeZone;
+  const here = zonedParts(tz, nowMs);
+  const targets = rule.weekdays?.length ? rule.weekdays : [rule.weekday];
+
+  let latest = -Infinity;
+  for (const weekday of targets) {
+    const deltaBack = (here.weekday - weekday + 7) % 7;
+    let candidate = zonedWallTimeToUtc(
+      tz,
+      here.year,
+      here.month,
+      here.day - deltaBack,
+      rule.hourLocal,
+      rule.minuteLocal ?? 0,
+    );
+
+    let guard = 0;
+    while (candidate > nowMs && guard++ < 60) {
+      candidate -= stepDays * DAY_MS;
+    }
+
+    if (candidate > latest) latest = candidate;
+  }
+
+  return Math.max(latest, forcedPrev);
+}
+
 // ---------------------------------------------------------------------------
 // Resolución por servidor
 // ---------------------------------------------------------------------------
@@ -171,10 +218,24 @@ export interface ResolveInput {
 export function resolveNextWipe(input: ResolveInput, nowMs: number): WipeResolution {
   const forced = nextForcedWipe(nowMs);
 
+  /**
+   * El último wipe real de la fuente siempre gana. Si no lo hay pero el
+   * servidor tiene calendario, se deduce de él; así el catálogo también
+   * puede decir cuándo wipeó por última vez.
+   */
+  const lastWipe = (): Pick<WipeResolution, 'lastWipeMs' | 'lastWipeIsDerived'> => {
+    if (input.lastWipeMs) return { lastWipeMs: input.lastWipeMs, lastWipeIsDerived: false };
+    if (input.rule) {
+      return { lastWipeMs: previousWipeFromRule(input.rule, nowMs), lastWipeIsDerived: true };
+    }
+    return { lastWipeMs: null, lastWipeIsDerived: false };
+  };
+
   // 1. Dato directo de la fuente.
   if (input.nextWipeMs && input.nextWipeMs > nowMs) {
     return {
       nextWipeMs: input.nextWipeMs,
+      ...lastWipe(),
       confidence: 'confirmado',
       cadence: cadenceLabel(input.rule?.cadence ?? null, input.name, input.tags),
       explanation: 'el servidor publica la fecha de su próximo wipe.',
@@ -186,6 +247,7 @@ export function resolveNextWipe(input: ResolveInput, nowMs: number): WipeResolut
   if (input.rule) {
     return {
       nextWipeMs: nextWipeFromRule(input.rule, nowMs),
+      ...lastWipe(),
       confidence: input.rule.approximate ? 'estimado' : 'programado',
       cadence: input.rule.cadence,
       explanation: input.rule.approximate
@@ -199,6 +261,7 @@ export function resolveNextWipe(input: ResolveInput, nowMs: number): WipeResolut
   if (input.type === 'official' && detected === null) {
     return {
       nextWipeMs: forced,
+      ...lastWipe(),
       confidence: 'programado',
       cadence: 'monthly',
       explanation: 'servidor oficial: wipea en el forced wipe mensual.',
@@ -210,6 +273,7 @@ export function resolveNextWipe(input: ResolveInput, nowMs: number): WipeResolut
     if (detected === null) {
       return {
         nextWipeMs: forced,
+        ...lastWipe(),
         confidence: 'estimado',
         cadence: 'monthly',
         explanation: 'sin pistas de ciclo en el nombre: se asume mensual (forced wipe).',
@@ -226,6 +290,7 @@ export function resolveNextWipe(input: ResolveInput, nowMs: number): WipeResolut
     const clamped = Math.min(next, forced);
     return {
       nextWipeMs: clamped,
+      ...lastWipe(),
       confidence: 'estimado',
       cadence: cadenceFromDays(detected),
       explanation:
@@ -238,6 +303,7 @@ export function resolveNextWipe(input: ResolveInput, nowMs: number): WipeResolut
   // 4. Nada.
   return {
     nextWipeMs: null,
+    ...lastWipe(),
     confidence: 'desconocido',
     cadence: null,
     explanation: 'no hay fecha de último wipe ni calendario conocido.',

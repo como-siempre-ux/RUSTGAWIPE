@@ -18,6 +18,13 @@ export type WipeConfidence = 'confirmado' | 'programado' | 'estimado' | 'descono
 
 export interface WipeResolution {
   nextWipeMs: number | null;
+  /**
+   * Último wipe. Si la fuente no lo da pero el servidor tiene calendario, se
+   * calcula con las mismas reglas mirando hacia atrás.
+   */
+  lastWipeMs: number | null;
+  /** `true` si el último wipe está calculado, no observado. */
+  lastWipeIsDerived: boolean;
   confidence: WipeConfidence;
   cadence: Cadence | null;
   /** Frase corta para el tooltip: de dónde sale el dato. */
@@ -68,6 +75,8 @@ export interface RustServer {
   country: string | null;
   region: string | null;
   lastWipeMs: number | null;
+  /** `true` si el último wipe sale del calendario, no de la fuente. */
+  lastWipeIsDerived: boolean;
   nextWipeMs: number | null;
   confidence: WipeConfidence;
   cadence: Cadence | null;
