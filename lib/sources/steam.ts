@@ -48,6 +48,7 @@ export function toRawFromSteam(s: SteamServer): RawServer {
     port: s.gameport ?? (portStr ? Number(portStr) : null),
     players: s.players ?? tags.currentPlayers,
     maxPlayers: s.max_players ?? tags.maxPlayers,
+    queued: tags.queued,
     country: null, // Steam no lo da; se deduce del nombre.
     lastWipeIso: tags.bornMs ? new Date(tags.bornMs).toISOString() : null,
     nextWipeIso: null, // Steam nunca lo da.

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { CATALOG_SNAPSHOT_DATE } from '../catalog';
 import { catalogAsServers, reresolveAll } from '../normalize';
 import { DAY_MS } from '../time';
 
@@ -10,7 +11,8 @@ import { DAY_MS } from '../time';
  * dando horas correctas, que es lo único que hace creíble al sitio estático.
  */
 describe('recalcular las horas con un payload viejo', () => {
-  const CONSTRUIDO = Date.parse('2025-08-01T12:00:00.000Z');
+  // Posterior a la foto: sus anclas de wipe no pueden caer en el futuro.
+  const CONSTRUIDO = Date.parse(`${CATALOG_SNAPSHOT_DATE}T12:00:00.000Z`) + DAY_MS;
   const payloadViejo = catalogAsServers(CONSTRUIDO);
 
   it('un payload de hace un mes da wipes en el futuro, no en el pasado', () => {
@@ -52,9 +54,13 @@ describe('recalcular las horas con un payload viejo', () => {
     expect(rehecho.map((s) => s.confidence)).toEqual(deCero.map((s) => s.confidence));
   });
 
-  it('el payload lleva la regla de cada servidor: sin eso no se puede rehacer', () => {
+  it('el payload lleva lo necesario para rehacer la cuenta', () => {
+    // O el calendario de su comunidad, o el ancla del último wipe. Sin una de
+    // las dos cosas no hay forma de saber cuándo wipea, y así se dice.
+    const sinNada = payloadViejo.filter((s) => s.rule === null && s.sourceLastWipeMs === null);
+    expect(sinNada.length).toBeLessThan(5);
+
     const conComunidad = payloadViejo.filter((s) => s.community !== null);
-    expect(conComunidad.length).toBe(payloadViejo.length);
     expect(conComunidad.every((s) => s.rule !== null)).toBe(true);
   });
 

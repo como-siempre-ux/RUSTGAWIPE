@@ -14,7 +14,8 @@
     "check:steam": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-steam.mts",
     "build:data": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-dataset.mts",
     "build:static": "npm run build:data && node scripts/build-static.mjs",
-    "preview:static": "node scripts/serve-static.mjs"
+    "preview:static": "node scripts/serve-static.mjs",
+    "build:snapshot": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-snapshot.mts"
   },
   "dependencies": {
     "next": "15.5.4",

@@ -135,6 +135,12 @@ export function ServerCard({
             <Fact label="jugadores">
               <span className="tnum text-bone">{server.players ?? '—'}</span>
               <span className="text-ash">/{server.maxPlayers ?? '—'}</span>
+              {server.queued ? (
+                <span className="tnum text-sulfur" title="gente esperando para entrar">
+                  {' '}
+                  +{server.queued} en cola
+                </span>
+              ) : null}
               {server.source === 'catalog' && <span className="text-ash/60"> (típico)</span>}
             </Fact>
 

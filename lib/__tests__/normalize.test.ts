@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { CATALOG_SERVERS, COMMUNITIES } from '../catalog';
+import { CATALOG_SNAPSHOT_DATE } from '../catalog';
 import { catalogAsServers, normalizeAll, sortByPopulation, sortServers } from '../normalize';
 import type { RawServer } from '../sources/battlemetrics';
 
@@ -104,95 +104,90 @@ describe('sortServers', () => {
   });
 });
 
-describe('catálogo sin credenciales', () => {
-  const servers = catalogAsServers(NOW);
+describe('catálogo de reserva (foto real de Steam)', () => {
+  // La foto es de una fecha concreta; el "ahora" tiene que ser posterior o
+  // las anclas de wipe caerían en el futuro.
+  const AHORA = Date.parse(`${CATALOG_SNAPSHOT_DATE}T12:00:00.000Z`) + 3 * 864e5;
+  const servers = catalogAsServers(AHORA);
 
-  it('devuelve servidores y todos tienen próximo wipe resuelto', () => {
-    expect(servers.length).toBeGreaterThan(30);
-    expect(servers.every((s) => s.nextWipeMs !== null)).toBe(true);
+  it('son servidores reales, no una lista escrita a mano', () => {
+    expect(servers.length).toBeGreaterThan(100);
+    // Todos vienen de la foto, así que ninguno puede tener un id inventado.
+    expect(servers.every((s) => s.id.startsWith('snap-'))).toBe(true);
   });
 
-  it('nunca se marca nada como confirmado: el catálogo no es el servidor', () => {
+  it('no se inventa nada que la foto no traiga', () => {
+    // Ni ips, ni tamaños de mapa, ni seeds: eso era lo que estaba inventado.
+    expect(servers.every((s) => s.connect === null)).toBe(true);
+    expect(servers.every((s) => s.mapSize === null)).toBe(true);
+    expect(servers.every((s) => s.mapSeed === null)).toBe(true);
+  });
+
+  it('la población nunca pasa del aforo', () => {
+    const malos = servers
+      .filter((s) => s.players !== null && s.maxPlayers !== null && s.players > s.maxPlayers)
+      .map((s) => `${s.name} ${s.players}/${s.maxPlayers}`);
+    expect(malos).toEqual([]);
+  });
+
+  it('nunca se marca nada como confirmado: la foto no es el servidor', () => {
     expect(servers.some((s) => s.confidence === 'confirmado')).toBe(false);
   });
 
-  it('los calendarios verificados son programado y los demás estimado', () => {
-    expect(servers.every((s) => s.confidence === 'programado' || s.confidence === 'estimado')).toBe(
-      true,
-    );
-    // Tiene que haber de los dos: si no, o no se verifica nada o se verifica todo.
-    expect(servers.some((s) => s.confidence === 'programado')).toBe(true);
-    expect(servers.some((s) => s.confidence === 'estimado')).toBe(true);
-
-    const rustafied = servers.find((s) => s.name === 'Rustafied.com - EU Main')!;
-    expect(rustafied.confidence).toBe('programado');
-
-    const warbandits = servers.find((s) => s.community === 'WarBandits')!;
-    expect(warbandits.confidence).toBe('estimado');
+  it('los que casan con una comunidad usan su calendario', () => {
+    const conComunidad = servers.filter((s) => s.community !== null);
+    expect(conComunidad.length).toBeGreaterThan(50);
+    expect(conComunidad.every((s) => s.rule !== null)).toBe(true);
+    expect(conComunidad.every((s) => s.confidence !== 'desconocido')).toBe(true);
   });
 
-  it('todos traen último wipe calculado y en el pasado', () => {
-    expect(servers.every((s) => s.lastWipeMs !== null)).toBe(true);
-    expect(servers.every((s) => s.lastWipeMs! <= NOW)).toBe(true);
-    // Ninguno viene de una fuente real, así que todos van marcados.
-    expect(servers.every((s) => s.lastWipeIsDerived)).toBe(true);
+  it('los de marca desconocida se resuelven por su ancla de wipe', () => {
+    const sinComunidad = servers.filter((s) => s.community === null);
+    // Es normal que los haya: la foto trae servidores de todo el mundo, no
+    // sólo de las comunidades que tenemos fichadas.
+    expect(sinComunidad.length).toBeGreaterThan(0);
+    const conAncla = sinComunidad.filter((s) => s.sourceLastWipeMs !== null);
+    expect(conAncla.every((s) => s.nextWipeMs !== null)).toBe(true);
+  });
+
+  it('el próximo wipe siempre cae en el futuro', () => {
+    const pasados = servers
+      .filter((s) => s.nextWipeMs !== null && s.nextWipeMs <= AHORA)
+      .map((s) => s.name);
+    expect(pasados).toEqual([]);
   });
 
   it('el último wipe siempre es anterior al próximo', () => {
     const malos = servers
-      .filter((s) => s.lastWipeMs! >= s.nextWipeMs!)
+      .filter((s) => s.lastWipeMs !== null && s.nextWipeMs !== null && s.lastWipeMs >= s.nextWipeMs)
       .map((s) => s.name);
     expect(malos).toEqual([]);
   });
 
-  it('hay servidores de cada tamaño de grupo, para que los filtros sirvan', () => {
-    const cuenta = (n: number) => servers.filter((s) => s.groupLimit === n).length;
-    expect(cuenta(1)).toBeGreaterThanOrEqual(4); // solo
-    expect(cuenta(2)).toBeGreaterThanOrEqual(15); // dúo
-    expect(cuenta(3)).toBeGreaterThanOrEqual(10); // trío
-    expect(cuenta(4)).toBeGreaterThanOrEqual(4); // cuarteto
-    expect(cuenta(0)).toBeGreaterThanOrEqual(1); // sin límite
+  it('un ancla vieja no se enseña como "wipeó hace tres meses"', () => {
+    // La foto es de hace días, pero sus anclas pueden ser de mucho antes.
+    // Al avanzarlas al ciclo actual, ningún último wipe puede quedar más
+    // atrás que un ciclo mensual.
+    const viejos = servers
+      .filter((s) => s.lastWipeMs !== null && AHORA - s.lastWipeMs > 40 * 864e5)
+      .map((s) => s.name);
+    expect(viejos).toEqual([]);
   });
 
-  it('deduce el tamaño de grupo del nombre', () => {
-    const wb = servers.find((s) => s.name.includes('EU 3X |Solo/Duo/Trio|'))!;
-    expect(wb.groupLimit).toBe(3);
-
-    const solo = servers.find((s) => s.name.includes('SOLO ONLY | No Clans'))!;
-    expect(solo.groupLimit).toBe(1);
-
-    const sinPista = servers.find((s) => s.name === 'Rustafied.com - EU Main')!;
-    expect(sinPista.groupLimit).toBeNull();
+  it('deduce el tamaño de grupo de los nombres reales', () => {
+    const conGrupo = servers.filter((s) => s.groupLimit !== null);
+    expect(conGrupo.length).toBeGreaterThan(20);
+    expect(conGrupo.every((s) => s.groupLimit! >= 0 && s.groupLimit! <= 12)).toBe(true);
   });
 
-  it('no se inventa ips', () => {
-    expect(servers.every((s) => s.connect === null)).toBe(true);
-  });
-
-  it('sale ordenado por wipe más próximo', () => {
-    for (let i = 1; i < servers.length; i++) {
-      expect(servers[i].nextWipeMs!).toBeGreaterThanOrEqual(servers[i - 1].nextWipeMs!);
+  it('sale ordenado por wipe más próximo, con los desconocidos al final', () => {
+    const conFecha = servers.filter((s) => s.nextWipeMs !== null);
+    for (let i = 1; i < conFecha.length; i++) {
+      expect(conFecha[i].nextWipeMs!).toBeGreaterThanOrEqual(conFecha[i - 1].nextWipeMs!);
     }
-  });
-
-  it('cada servidor del catálogo casa con su comunidad', () => {
-    const huerfanos = servers.filter((s) => s.community === null).map((s) => s.name);
-    expect(huerfanos).toEqual([]);
-  });
-
-  it('no hay ids ni nombres repetidos', () => {
-    const ids = CATALOG_SERVERS.map((s) => s.id);
-    expect(new Set(ids).size).toBe(ids.length);
-
-    const nombres = CATALOG_SERVERS.map((s) => s.name);
-    expect(new Set(nombres).size).toBe(nombres.length);
-  });
-
-  it('todas las comunidades del catálogo tienen al menos un servidor', () => {
-    const conServidor = new Set(servers.map((s) => s.community));
-    const sinServidor = COMMUNITIES.map((c) => c.name).filter((n) => !conServidor.has(n));
-    // Facepunch y Reddit sí los tienen; si alguna otra se queda sin servidor
-    // es que la regex de `match` no casa con los nombres que hemos puesto.
-    expect(sinServidor).toEqual([]);
+    const primerNulo = servers.findIndex((s) => s.nextWipeMs === null);
+    if (primerNulo !== -1) {
+      expect(servers.slice(primerNulo).every((s) => s.nextWipeMs === null)).toBe(true);
+    }
   });
 });

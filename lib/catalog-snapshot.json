@@ -1,0 +1,1606 @@
+{
+ "_comment": "Foto real de la lista de Steam, no una lista escrita a mano. Se regenera con `npm run build:snapshot`. La poblacion es del dia de la foto; lastWipeMs vale como ancla de fase, no como fecha para ensenar.",
+ "takenAt": "2026-08-24",
+ "servers": [
+  {
+   "name": "MIRAGE RUST | SUNDAY 2x | Wipe 23.08",
+   "type": "modded",
+   "players": 920,
+   "maxPlayers": 1200,
+   "region": null,
+   "lastWipeMs": 1787482800000
+  },
+  {
+   "name": "Atlas - EU 2X Medium | Vanilla+ | No BP Wipes",
+   "type": "modded",
+   "players": 700,
+   "maxPlayers": 700,
+   "region": "Europa",
+   "lastWipeMs": 1787241483000
+  },
+  {
+   "name": "[AU] Winterust - 2x Mondays",
+   "type": "modded",
+   "players": 698,
+   "maxPlayers": 700,
+   "region": "Oceanía",
+   "lastWipeMs": 1787551138000
+  },
+  {
+   "name": "Rustafied.com - AU Monday",
+   "type": "community",
+   "players": 600,
+   "maxPlayers": 600,
+   "region": "Oceanía",
+   "lastWipeMs": 1787547522000
+  },
+  {
+   "name": "Rustoria.co - EU East Medium",
+   "type": "community",
+   "players": 600,
+   "maxPlayers": 600,
+   "region": "Europa",
+   "lastWipeMs": 1787234825000
+  },
+  {
+   "name": "777 RUST /ДЛЯ НОВИЧКОВ /ПИТЕРСКИЙ 24.08",
+   "type": "community",
+   "players": 522,
+   "maxPlayers": 550,
+   "region": null,
+   "lastWipeMs": 1787550907000
+  },
+  {
+   "name": "WARBANDITS.GG EU 3X |Solo/Duo/Trio|LootX3| JUST WIPED",
+   "type": "modded",
+   "players": 483,
+   "maxPlayers": 500,
+   "region": "Europa",
+   "lastWipeMs": 1787489878000
+  },
+  {
+   "name": "ВОСТОК | MONDAY X2",
+   "type": "community",
+   "players": 450,
+   "maxPlayers": 450,
+   "region": null,
+   "lastWipeMs": 1787551024000
+  },
+  {
+   "name": "404 RUST 2Х|ДЛЯ НОВИЧКОВ|EU MAIN 23.08",
+   "type": "community",
+   "players": 450,
+   "maxPlayers": 700,
+   "region": "Europa",
+   "lastWipeMs": 1787493333000
+  },
+  {
+   "name": "Новосибирск | Monday 2x",
+   "type": "modded",
+   "players": 445,
+   "maxPlayers": 445,
+   "region": null,
+   "lastWipeMs": 1787561817000
+  },
+  {
+   "name": "Magic Rust #14 —  Modded 2x (No limit) | Baйп 21.08",
+   "type": "modded",
+   "players": 430,
+   "maxPlayers": 480,
+   "region": null,
+   "lastWipeMs": 1787306521000
+  },
+  {
+   "name": "666 RUST /ДЛЯ НОВИЧКОВ /МОСКОВСКИЙ 24.08",
+   "type": "community",
+   "players": 421,
+   "maxPlayers": 650,
+   "region": null,
+   "lastWipeMs": 1787561716000
+  },
+  {
+   "name": "Magic Rust #22 — Vanilla 2x (Biweekly) | Baйп 21.08",
+   "type": "modded",
+   "players": 420,
+   "maxPlayers": 420,
+   "region": null,
+   "lastWipeMs": 1787306491000
+  },
+  {
+   "name": "Rusty Moose |EU Biweekly|",
+   "type": "community",
+   "players": 376,
+   "maxPlayers": 400,
+   "region": "Europa",
+   "lastWipeMs": 1787234592000
+  },
+  {
+   "name": "Rustoria.co - EU Medium",
+   "type": "community",
+   "players": 376,
+   "maxPlayers": 400,
+   "region": "Europa",
+   "lastWipeMs": 1787234449000
+  },
+  {
+   "name": "Vital Rust - EU Medium | 2x | Vanilla+ | No BP Wipes",
+   "type": "modded",
+   "players": 360,
+   "maxPlayers": 375,
+   "region": "Europa",
+   "lastWipeMs": 1787328309000
+  },
+  {
+   "name": "Magic Rust #31 — Modded 2x (Solo/Duo) | Baйп 23.08",
+   "type": "modded",
+   "players": 350,
+   "maxPlayers": 350,
+   "region": null,
+   "lastWipeMs": 1787479289000
+  },
+  {
+   "name": "MICRO-RUST x50 - x100 MAX5",
+   "type": "modded",
+   "players": 344,
+   "maxPlayers": 360,
+   "region": null,
+   "lastWipeMs": 1787309848000
+  },
+  {
+   "name": "Rustoria.co - EU East Long",
+   "type": "community",
+   "players": 343,
+   "maxPlayers": 375,
+   "region": "Europa",
+   "lastWipeMs": 1786038379000
+  },
+  {
+   "name": "EU RENEGADE 2x Monthly Medium | 50% Upkeep | No BP Wipe | Biwee",
+   "type": "modded",
+   "players": 331,
+   "maxPlayers": 350,
+   "region": "Europa",
+   "lastWipeMs": 1787233988000
+  },
+  {
+   "name": "MIRAGE RUST | MAIN 2x | Wipe 21.08",
+   "type": "modded",
+   "players": 331,
+   "maxPlayers": 1000,
+   "region": null,
+   "lastWipeMs": 1787320800000
+  },
+  {
+   "name": "WARBANDITS.GG AU 3X |Solo/Duo|LootX3| JUST WIPED",
+   "type": "modded",
+   "players": 329,
+   "maxPlayers": 350,
+   "region": "Oceanía",
+   "lastWipeMs": 1787547446000
+  },
+  {
+   "name": "X1000000.RU|HARDPVP|FUN|FPS++|X1000000000000000000000000000000",
+   "type": "community",
+   "players": 320,
+   "maxPlayers": 360,
+   "region": null,
+   "lastWipeMs": 1787105537000
+  },
+  {
+   "name": "Rustafied.com - EU Medium - Large",
+   "type": "community",
+   "players": 318,
+   "maxPlayers": 375,
+   "region": "Europa",
+   "lastWipeMs": 1787234352000
+  },
+  {
+   "name": "404 RUST SOLO/DUO/TRIO | ПН | ДЛЯ НОВИЧКОВ 24.08",
+   "type": "community",
+   "players": 311,
+   "maxPlayers": 550,
+   "region": null,
+   "lastWipeMs": 1787554496000
+  },
+  {
+   "name": "Survivors.gg #7 [ 2x Vanilla ] FULLWIPED 23.08",
+   "type": "modded",
+   "players": 306,
+   "maxPlayers": 350,
+   "region": null,
+   "lastWipeMs": 1787479165000
+  },
+  {
+   "name": "Bestrust Main 2x - Weekly | JUST WIPED 23.08 08/23",
+   "type": "modded",
+   "players": 298,
+   "maxPlayers": 350,
+   "region": null,
+   "lastWipeMs": 1787482126000
+  },
+  {
+   "name": "Magic Rust #13 — Vanilla 2x | Baйп 21.08",
+   "type": "modded",
+   "players": 295,
+   "maxPlayers": 320,
+   "region": null,
+   "lastWipeMs": 1787306509000
+  },
+  {
+   "name": "WARBANDITS.GG 3X |Solo/Duo/Trio|LootX3| JUST FULLWIPED",
+   "type": "modded",
+   "players": 280,
+   "maxPlayers": 300,
+   "region": null,
+   "lastWipeMs": 1787507870000
+  },
+  {
+   "name": "Atlas - EU 10x | No BPs | Kits | Shop",
+   "type": "modded",
+   "players": 279,
+   "maxPlayers": 300,
+   "region": "Europa",
+   "lastWipeMs": 1787327893000
+  },
+  {
+   "name": "Vitality - EU Monthly | 2x | Vanilla+ | No BP Wipes",
+   "type": "modded",
+   "players": 278,
+   "maxPlayers": 300,
+   "region": "Europa",
+   "lastWipeMs": 1787241477000
+  },
+  {
+   "name": "РОССИЯ X2 / ДЛЯ НОВИЧКОВ / THIS IS RUST!",
+   "type": "community",
+   "players": 259,
+   "maxPlayers": 300,
+   "region": null,
+   "lastWipeMs": 1787309945000
+  },
+  {
+   "name": "WARBANDITS.GG EU 2X |Solo/Duo/Trio|X2 JUST FULLWIPED",
+   "type": "modded",
+   "players": 258,
+   "maxPlayers": 275,
+   "region": "Europa",
+   "lastWipeMs": 1787489887000
+  },
+  {
+   "name": "Atlas - US 2X Medium | Vanilla+ | No BP Wipes",
+   "type": "modded",
+   "players": 249,
+   "maxPlayers": 300,
+   "region": "Norteamérica",
+   "lastWipeMs": 1787259484000
+  },
+  {
+   "name": "Rustopia.gg - EU Medium",
+   "type": "community",
+   "players": 245,
+   "maxPlayers": 275,
+   "region": "Europa",
+   "lastWipeMs": 1787234274000
+  },
+  {
+   "name": "Rusty Moose |US Biweekly|",
+   "type": "community",
+   "players": 243,
+   "maxPlayers": 275,
+   "region": "Norteamérica",
+   "lastWipeMs": 1787252477000
+  },
+  {
+   "name": "Rustoria.co - SEA Medium",
+   "type": "community",
+   "players": 243,
+   "maxPlayers": 250,
+   "region": "Asia",
+   "lastWipeMs": 1787210109000
+  },
+  {
+   "name": "Atlas - EU 2X Monthly | Vanilla+ | No BP Wipes",
+   "type": "modded",
+   "players": 238,
+   "maxPlayers": 250,
+   "region": "Europa",
+   "lastWipeMs": 1786039101000
+  },
+  {
+   "name": "Blood Rust - Black [nolimit, x2]",
+   "type": "community",
+   "players": 220,
+   "maxPlayers": 220,
+   "region": null,
+   "lastWipeMs": 1787389682000
+  },
+  {
+   "name": "[EU] Facepunch 16",
+   "type": "official",
+   "players": 219,
+   "maxPlayers": 300,
+   "region": "Europa",
+   "lastWipeMs": 1786038424000
+  },
+  {
+   "name": "Reddit.com/r/PlayRust - EU Biweekly",
+   "type": "community",
+   "players": 216,
+   "maxPlayers": 300,
+   "region": "Europa",
+   "lastWipeMs": 1787234435000
+  },
+  {
+   "name": "Japan Tokyo - Mondays|8/24|JP/KR/SEA|2週間|JumpRust.com",
+   "type": "community",
+   "players": 215,
+   "maxPlayers": 215,
+   "region": "Asia",
+   "lastWipeMs": 1787561217000
+  },
+  {
+   "name": "RUSTBURG.GG #1〔X5/X10|NO LIMIT|LOOT+|FPS+|KITS|TP〕22.08",
+   "type": "modded",
+   "players": 214,
+   "maxPlayers": 220,
+   "region": null,
+   "lastWipeMs": 1787392727000
+  },
+  {
+   "name": "Rustafied.com - EU Trio",
+   "type": "community",
+   "players": 211,
+   "maxPlayers": 250,
+   "region": "Europa",
+   "lastWipeMs": 1787234329000
+  },
+  {
+   "name": "Magic Rust #7 — Modded 2x (Solo/Duo/Trio) | Baйп 21.08",
+   "type": "modded",
+   "players": 210,
+   "maxPlayers": 240,
+   "region": null,
+   "lastWipeMs": 1787306474000
+  },
+  {
+   "name": "TemplarGaming EU 10x Swift Loot++|PvP|MyMini|SkinBox|x10 JUST W",
+   "type": "modded",
+   "players": 201,
+   "maxPlayers": 250,
+   "region": "Europa",
+   "lastWipeMs": 1787403313000
+  },
+  {
+   "name": "Rustafied.com - AU Medium",
+   "type": "community",
+   "players": 194,
+   "maxPlayers": 250,
+   "region": "Oceanía",
+   "lastWipeMs": 1787201971000
+  },
+  {
+   "name": "Magic Rust #27 — Vanilla 2x (Monthly) | Pyccкий",
+   "type": "modded",
+   "players": 192,
+   "maxPlayers": 300,
+   "region": null,
+   "lastWipeMs": 1786038749000
+  },
+  {
+   "name": "WARBANDITS.GG 2X |Solo/Duo/Trio|X2 JUST FULLWIPED",
+   "type": "modded",
+   "players": 186,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787507835000
+  },
+  {
+   "name": "RETRO RUST #1 Х1000|NOLIMIT|LOOT++|KIT GLOBAL 21.08",
+   "type": "community",
+   "players": 186,
+   "maxPlayers": 225,
+   "region": null,
+   "lastWipeMs": 1787309911000
+  },
+  {
+   "name": "#3 BroRust X50/X100|G WIPE 22.08|MAX5|NoBP|Loot+|Copter",
+   "type": "community",
+   "players": 185,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787392776000
+  },
+  {
+   "name": "RETRO RUST #3 Х5|MAX 5|LOOT+|CRAFT WIPE 23.08",
+   "type": "community",
+   "players": 181,
+   "maxPlayers": 250,
+   "region": null,
+   "lastWipeMs": 1787479399000
+  },
+  {
+   "name": "Rustopia.gg - US Medium",
+   "type": "community",
+   "players": 176,
+   "maxPlayers": 225,
+   "region": "Norteamérica",
+   "lastWipeMs": 1787252277000
+  },
+  {
+   "name": "[EU] Brits PvE Worlds | RUST MMORPG | Quests | Custom Weapons",
+   "type": "community",
+   "players": 175,
+   "maxPlayers": 700,
+   "region": "Europa",
+   "lastWipeMs": 1777749430000
+  },
+  {
+   "name": "#3 DOZA RUST X200/X500 | MAX5 | LOOT+ | ДЛЯ НОВИЧКОВ",
+   "type": "community",
+   "players": 173,
+   "maxPlayers": 190,
+   "region": null,
+   "lastWipeMs": 1787551467000
+  },
+  {
+   "name": "Atlas - EU 2X Monthly Solo/Duo/Trio/Quad | Vanilla+ | No BP Wip",
+   "type": "modded",
+   "players": 172,
+   "maxPlayers": 200,
+   "region": "Europa",
+   "lastWipeMs": 1786039177000
+  },
+  {
+   "name": "[AU] AshRust 3x Monthly | QoL/Loot+ | Full Wiped",
+   "type": "modded",
+   "players": 171,
+   "maxPlayers": 200,
+   "region": "Oceanía",
+   "lastWipeMs": 1787310322000
+  },
+  {
+   "name": "WEREWOLF GAMING.CO 5x Solo/Duo/Trio|Loot x5|TP|Homes|Kits|WIPED",
+   "type": "modded",
+   "players": 170,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787489650000
+  },
+  {
+   "name": "RustGames.gg | Lucky Pillars",
+   "type": "community",
+   "players": 168,
+   "maxPlayers": 400,
+   "region": null,
+   "lastWipeMs": 1786041583000
+  },
+  {
+   "name": "[AU] HollowServers.co 3x Solo/Duo/Trio | Shared BPs",
+   "type": "modded",
+   "players": 165,
+   "maxPlayers": 175,
+   "region": "Oceanía",
+   "lastWipeMs": 1787543914000
+  },
+  {
+   "name": "Rustafied.com - EU Friday",
+   "type": "community",
+   "players": 162,
+   "maxPlayers": 225,
+   "region": "Europa",
+   "lastWipeMs": 1787327966000
+  },
+  {
+   "name": "[EU] Facepunch 15",
+   "type": "official",
+   "players": 161,
+   "maxPlayers": 300,
+   "region": "Europa",
+   "lastWipeMs": 1786038241000
+  },
+  {
+   "name": "Magic Rust — Long | Kлaccикa x1 | Pyccкий",
+   "type": "community",
+   "players": 160,
+   "maxPlayers": 300,
+   "region": null,
+   "lastWipeMs": 1786039533000
+  },
+  {
+   "name": "[EA] Softcore 1",
+   "type": "community",
+   "players": 159,
+   "maxPlayers": 350,
+   "region": null,
+   "lastWipeMs": 1786037956000
+  },
+  {
+   "name": "[EA] Facepunch 2",
+   "type": "official",
+   "players": 158,
+   "maxPlayers": 300,
+   "region": null,
+   "lastWipeMs": 1786038058000
+  },
+  {
+   "name": "WARBANDITS.GG EU 3X |Solo/Duo/Trio/Quad|LootX3| JUST WIPED",
+   "type": "modded",
+   "players": 156,
+   "maxPlayers": 200,
+   "region": "Europa",
+   "lastWipeMs": 1787403441000
+  },
+  {
+   "name": "[AU] HollowServers.co 10x No BPs [Loot++|Events|MyMini|Shop]",
+   "type": "modded",
+   "players": 155,
+   "maxPlayers": 175,
+   "region": "Oceanía",
+   "lastWipeMs": 1787543897000
+  },
+  {
+   "name": "Repulsion - Solo/Duo | FULLWIPE 23/08 23.08",
+   "type": "community",
+   "players": 154,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787482675000
+  },
+  {
+   "name": "РОССИЙСКИЙ x2 | GGRust #5 | Для нoвичкoв 2x",
+   "type": "modded",
+   "players": 153,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787229723000
+  },
+  {
+   "name": "666 RUST /ДЛЯ НОВИЧКОВ /РОССИЙСКИЙ 23.08",
+   "type": "community",
+   "players": 151,
+   "maxPlayers": 650,
+   "region": null,
+   "lastWipeMs": 1787475305000
+  },
+  {
+   "name": "MOJI RUST x500|MAX8|SKINS|LOOT++|KITS 21.08",
+   "type": "modded",
+   "players": 150,
+   "maxPlayers": 250,
+   "region": null,
+   "lastWipeMs": 1787315504000
+  },
+  {
+   "name": "Magic Rust #19 — 2x | Vanilla+ | Baйп 21.08",
+   "type": "modded",
+   "players": 148,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787306483000
+  },
+  {
+   "name": "Magic Rust #4 — Modded 2x (Solo/Duo/Trio) | Baйп 21.08",
+   "type": "modded",
+   "players": 148,
+   "maxPlayers": 180,
+   "region": null,
+   "lastWipeMs": 1787306503000
+  },
+  {
+   "name": "RURUST | УДАЧА | ДЛЯ НОВИЧКОВ 24.08",
+   "type": "community",
+   "players": 148,
+   "maxPlayers": 300,
+   "region": null,
+   "lastWipeMs": 1787561227000
+  },
+  {
+   "name": "[Whitelist]KagiRust7",
+   "type": "modded",
+   "players": 146,
+   "maxPlayers": 300,
+   "region": null,
+   "lastWipeMs": 1787068017000
+  },
+  {
+   "name": "404 RUST 2Х|ДЛЯ НОВИЧКОВ|РУССКИЙ 22.08",
+   "type": "community",
+   "players": 146,
+   "maxPlayers": 550,
+   "region": null,
+   "lastWipeMs": 1787406937000
+  },
+  {
+   "name": "[EU] Raid Simulator",
+   "type": "community",
+   "players": 145,
+   "maxPlayers": 150,
+   "region": "Europa",
+   "lastWipeMs": null
+  },
+  {
+   "name": "Magic Rust — Main | Kлaccикa x1 | Pyccкий",
+   "type": "community",
+   "players": 141,
+   "maxPlayers": 160,
+   "region": null,
+   "lastWipeMs": 1787234252000
+  },
+  {
+   "name": "404 RUST 2X|ДЛЯ НОВИЧКОВ|ПИТЕРСКИЙ 21.08",
+   "type": "modded",
+   "players": 137,
+   "maxPlayers": 500,
+   "region": null,
+   "lastWipeMs": 1787320579000
+  },
+  {
+   "name": "Rustoria.co - EU Long",
+   "type": "community",
+   "players": 136,
+   "maxPlayers": 200,
+   "region": "Europa",
+   "lastWipeMs": 1786038996000
+  },
+  {
+   "name": "[KR/JP]나히다서버/초보/자원밀도2배/WIPE 08.24",
+   "type": "community",
+   "players": 130,
+   "maxPlayers": 150,
+   "region": "Asia",
+   "lastWipeMs": 1787556727000
+  },
+  {
+   "name": "Rustoria.co - AU Premium",
+   "type": "community",
+   "players": 130,
+   "maxPlayers": 200,
+   "region": "Oceanía",
+   "lastWipeMs": 1787209631000
+  },
+  {
+   "name": "[EU East] Facepunch 4",
+   "type": "official",
+   "players": 123,
+   "maxPlayers": 350,
+   "region": "Europa",
+   "lastWipeMs": 1786038029000
+  },
+  {
+   "name": "Blood Rust - Red [duo, x2]",
+   "type": "community",
+   "players": 123,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787389672000
+  },
+  {
+   "name": "WARBANDITS.GG |Solo/Duo/Trio/Quad|Weekly| JUST WIPED",
+   "type": "community",
+   "players": 121,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787504238000
+  },
+  {
+   "name": "Rustoria.co - US Medium Premium",
+   "type": "community",
+   "players": 121,
+   "maxPlayers": 200,
+   "region": "Norteamérica",
+   "lastWipeMs": 1787252384000
+  },
+  {
+   "name": "Rustafied.com - EU Medium - Small",
+   "type": "community",
+   "players": 120,
+   "maxPlayers": 150,
+   "region": "Europa",
+   "lastWipeMs": 1787234324000
+  },
+  {
+   "name": "RUST ROOM 1.5x | SATURDAY | Wipe 22.08",
+   "type": "modded",
+   "players": 117,
+   "maxPlayers": 500,
+   "region": null,
+   "lastWipeMs": 1787392654000
+  },
+  {
+   "name": "Atlas - EU 5x | No BPs | Kits",
+   "type": "modded",
+   "players": 116,
+   "maxPlayers": 150,
+   "region": "Europa",
+   "lastWipeMs": 1787399887000
+  },
+  {
+   "name": "Survivors.gg #4 [ 2x Solo/Duo/Trio/Quad/Max5 ] WIPED 23.08",
+   "type": "modded",
+   "players": 116,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787497156000
+  },
+  {
+   "name": "Survivors.gg [ 2x Solo/Duo ] FULLWIPED 22.08",
+   "type": "modded",
+   "players": 115,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787410755000
+  },
+  {
+   "name": "404 RUST SOLO/DUO/TRIO | ВС | ДЛЯ НОВИЧКОВ 23.08",
+   "type": "community",
+   "players": 115,
+   "maxPlayers": 550,
+   "region": null,
+   "lastWipeMs": 1787468123000
+  },
+  {
+   "name": "『大世界』8.24/14:00新开/三人行/萌新入门服",
+   "type": "community",
+   "players": 115,
+   "maxPlayers": 260,
+   "region": null,
+   "lastWipeMs": 1787550560000
+  },
+  {
+   "name": "Bestrust Solo/Duo 2x | JUST FULLWIPED 23.08 08/23",
+   "type": "modded",
+   "players": 114,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787489390000
+  },
+  {
+   "name": "Rustafied.com - EU Long - Large",
+   "type": "community",
+   "players": 112,
+   "maxPlayers": 150,
+   "region": "Europa",
+   "lastWipeMs": 1786038387000
+  },
+  {
+   "name": "Rusty Moose |EU Monthly|",
+   "type": "community",
+   "players": 112,
+   "maxPlayers": 200,
+   "region": "Europa",
+   "lastWipeMs": 1786039507000
+  },
+  {
+   "name": "WARBANDITS.GG AU 3X |Solo/Duo/Trio|LootX3| JUST WIPED",
+   "type": "modded",
+   "players": 112,
+   "maxPlayers": 200,
+   "region": "Oceanía",
+   "lastWipeMs": 1787374648000
+  },
+  {
+   "name": "MIRAGE RUST | FRIDAY 2x | Wipe 21.08",
+   "type": "modded",
+   "players": 111,
+   "maxPlayers": 1000,
+   "region": null,
+   "lastWipeMs": 1787320800000
+  },
+  {
+   "name": "Japan Tokyo - Main|8/21|JP/KR/SEA|金曜日|JumpRust.com",
+   "type": "community",
+   "players": 110,
+   "maxPlayers": 415,
+   "region": "Asia",
+   "lastWipeMs": 1787301393000
+  },
+  {
+   "name": "【炮炮PVE启蒙】原倍|仿官|突袭|技能|纯净",
+   "type": "community",
+   "players": 110,
+   "maxPlayers": 300,
+   "region": null,
+   "lastWipeMs": 1787306605000
+  },
+  {
+   "name": "Rustafied.com - US Medium - Large",
+   "type": "community",
+   "players": 109,
+   "maxPlayers": 150,
+   "region": "Norteamérica",
+   "lastWipeMs": 1787252317000
+  },
+  {
+   "name": "Magic Rust #5 — Modded 2x (Solo/Duo) | Baйп 21.08",
+   "type": "modded",
+   "players": 107,
+   "maxPlayers": 120,
+   "region": null,
+   "lastWipeMs": 1787306472000
+  },
+  {
+   "name": "AceRust.com 3x Solo/Duo|LootX3| Shared BPs",
+   "type": "modded",
+   "players": 106,
+   "maxPlayers": 150,
+   "region": null,
+   "lastWipeMs": 1787508036000
+  },
+  {
+   "name": "Magic Rust #3 — Modded 2x (Solo/Duo/Trio) | Baйп 21.08",
+   "type": "modded",
+   "players": 106,
+   "maxPlayers": 140,
+   "region": null,
+   "lastWipeMs": 1787306467000
+  },
+  {
+   "name": "Rusty Moose |US Monthly|",
+   "type": "community",
+   "players": 105,
+   "maxPlayers": 200,
+   "region": "Norteamérica",
+   "lastWipeMs": 1786039368000
+  },
+  {
+   "name": "Rustafied.com - US Friday",
+   "type": "community",
+   "players": 103,
+   "maxPlayers": 125,
+   "region": "Norteamérica",
+   "lastWipeMs": 1787345923000
+  },
+  {
+   "name": "CoolingLine #1 - x1000 | NOLIMIT | FAST | LOOT+ | FPS |CLANS",
+   "type": "community",
+   "players": 102,
+   "maxPlayers": 120,
+   "region": null,
+   "lastWipeMs": 1787391689000
+  },
+  {
+   "name": "[US] Brits PvE Worlds | RUST MMORPG | Quests | Custom Weapons",
+   "type": "community",
+   "players": 101,
+   "maxPlayers": 800,
+   "region": "Norteamérica",
+   "lastWipeMs": 1777749245000
+  },
+  {
+   "name": "RustVikings | Solo/Duo | Sundays | FULLWIPE 23/08 17:00CEST",
+   "type": "community",
+   "players": 101,
+   "maxPlayers": 300,
+   "region": null,
+   "lastWipeMs": 1787497444000
+  },
+  {
+   "name": "[EA] Facepunch 1",
+   "type": "official",
+   "players": 101,
+   "maxPlayers": 250,
+   "region": null,
+   "lastWipeMs": 1786038268000
+  },
+  {
+   "name": "Rustafied.com - EU Main",
+   "type": "community",
+   "players": 99,
+   "maxPlayers": 125,
+   "region": "Europa",
+   "lastWipeMs": 1787234334000
+  },
+  {
+   "name": "Blood Rust - Blue [nolimit, x2]",
+   "type": "community",
+   "players": 99,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787389686000
+  },
+  {
+   "name": "Atlas - US 10x | No BPs | Kits | Shop",
+   "type": "modded",
+   "players": 98,
+   "maxPlayers": 150,
+   "region": "Norteamérica",
+   "lastWipeMs": 1787345898000
+  },
+  {
+   "name": "[TR/EU] CUMHURİYET | Solo Duo Trio | Yeni başlayanlar için",
+   "type": "community",
+   "players": 98,
+   "maxPlayers": 200,
+   "region": "Europa",
+   "lastWipeMs": 1787324274000
+  },
+  {
+   "name": "Rusty Moose |EU Low|",
+   "type": "community",
+   "players": 97,
+   "maxPlayers": 200,
+   "region": "Europa",
+   "lastWipeMs": 1787234381000
+  },
+  {
+   "name": "Blood Rust - Green [trio, x2]",
+   "type": "community",
+   "players": 97,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787389669000
+  },
+  {
+   "name": "WEREWOLF GAMING.CO 5x SOLO ONLY|TP|Home|Kits|No Teams|Loot x5|",
+   "type": "modded",
+   "players": 95,
+   "maxPlayers": 150,
+   "region": null,
+   "lastWipeMs": 1787493257000
+  },
+  {
+   "name": "AZARUST#3 [ X100000 | KITS | BATTLEFIELD | PVP ] 24.08",
+   "type": "modded",
+   "players": 94,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787306188000
+  },
+  {
+   "name": "BATTLEFIELD x1000000 | BILLION | MILLION | ПАЛЯНИЦЯ",
+   "type": "modded",
+   "players": 94,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787453304000
+  },
+  {
+   "name": "Rustafied.com - EU Solo",
+   "type": "community",
+   "players": 93,
+   "maxPlayers": 125,
+   "region": "Europa",
+   "lastWipeMs": 1787234332000
+  },
+  {
+   "name": "KRAKEN | X10 | EU | KITS | RP | FPS+",
+   "type": "modded",
+   "players": 91,
+   "maxPlayers": 250,
+   "region": "Europa",
+   "lastWipeMs": 1787234595000
+  },
+  {
+   "name": "777 RUST /ДЛЯ НОВИЧКОВ /РОССИЯ 23.08",
+   "type": "community",
+   "players": 91,
+   "maxPlayers": 550,
+   "region": null,
+   "lastWipeMs": 1787464518000
+  },
+  {
+   "name": "EU Limitless 2x Monthly Main | No BP Wipes | x2",
+   "type": "modded",
+   "players": 88,
+   "maxPlayers": 200,
+   "region": "Europa",
+   "lastWipeMs": 1786038704000
+  },
+  {
+   "name": "MRAZ RUST [ X5/X10 | NOLIMIT | LOOT+ | KITS ] 21.08",
+   "type": "modded",
+   "players": 88,
+   "maxPlayers": 250,
+   "region": null,
+   "lastWipeMs": 1787309895000
+  },
+  {
+   "name": "EU RENEGADE 2x Monthly Main | 50% Upkeep | No BP Wipe | Noob Fr",
+   "type": "modded",
+   "players": 87,
+   "maxPlayers": 150,
+   "region": "Europa",
+   "lastWipeMs": 1786038608000
+  },
+  {
+   "name": "WEREWOLF GAMING.CO 3x Solo/Duo/Trio|Loot x3|Share BPs| WIPED",
+   "type": "modded",
+   "players": 87,
+   "maxPlayers": 500,
+   "region": null,
+   "lastWipeMs": 1787493250000
+  },
+  {
+   "name": "AQRUX RUST GREEN | X2 | SEMI-CLASSIC | THURSDAY",
+   "type": "community",
+   "players": 87,
+   "maxPlayers": 250,
+   "region": null,
+   "lastWipeMs": 1787223196000
+  },
+  {
+   "name": "Классика x5 для НОВИЧКОВ |Loot+|BigBoyRust|",
+   "type": "community",
+   "players": 86,
+   "maxPlayers": 300,
+   "region": null,
+   "lastWipeMs": 1787313369000
+  },
+  {
+   "name": "Magic Rust #30 — Modded 2x (Solo/Duo) | Baйп 22.08",
+   "type": "modded",
+   "players": 86,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787392862000
+  },
+  {
+   "name": "Rustoria.co - SEA Long",
+   "type": "community",
+   "players": 86,
+   "maxPlayers": 200,
+   "region": "Asia",
+   "lastWipeMs": 1786038162000
+  },
+  {
+   "name": "WARBANDITS.GG EU 2X |Solo/Duo|X2 JUST WIPED",
+   "type": "modded",
+   "players": 85,
+   "maxPlayers": 200,
+   "region": "Europa",
+   "lastWipeMs": 1787403437000
+  },
+  {
+   "name": "Survivors.gg #3 [ 2x Solo/Duo/Trio ] FULLWIPED 23.08",
+   "type": "modded",
+   "players": 85,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787489951000
+  },
+  {
+   "name": "Rustafied.com - AU Long",
+   "type": "community",
+   "players": 85,
+   "maxPlayers": 100,
+   "region": "Oceanía",
+   "lastWipeMs": 1786038393000
+  },
+  {
+   "name": "Rusty Moose |US Small|",
+   "type": "community",
+   "players": 81,
+   "maxPlayers": 200,
+   "region": "Norteamérica",
+   "lastWipeMs": 1786039414000
+  },
+  {
+   "name": "Rustafied.com - SEA Medium",
+   "type": "community",
+   "players": 81,
+   "maxPlayers": 100,
+   "region": "Asia",
+   "lastWipeMs": 1787209234000
+  },
+  {
+   "name": "РУССКИЙ #2 | СЕРВЕР НОВИЧКОВ | 2X VANILLA",
+   "type": "modded",
+   "players": 80,
+   "maxPlayers": 150,
+   "region": null,
+   "lastWipeMs": 1787381698000
+  },
+  {
+   "name": "[PvE]Тульский|Русский|Classic+Ивенты",
+   "type": "community",
+   "players": 80,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787111498000
+  },
+  {
+   "name": "Rustafied.com - US Trio",
+   "type": "community",
+   "players": 79,
+   "maxPlayers": 100,
+   "region": "Norteamérica",
+   "lastWipeMs": 1787252322000
+  },
+  {
+   "name": "US Limitless 2x Monthly Solo/Duo|No BP Wipes|Noob Friendly",
+   "type": "modded",
+   "players": 79,
+   "maxPlayers": 200,
+   "region": "Norteamérica",
+   "lastWipeMs": 1786038823000
+  },
+  {
+   "name": "Reddit.com/r/PlayRust - US Biweekly",
+   "type": "community",
+   "players": 78,
+   "maxPlayers": 250,
+   "region": "Norteamérica",
+   "lastWipeMs": 1787252351000
+  },
+  {
+   "name": "[JP][PVE] パグさば Pug-Server ver 25.5 | 8/24~9/3",
+   "type": "community",
+   "players": 78,
+   "maxPlayers": 100,
+   "region": "Asia",
+   "lastWipeMs": 1787555703000
+  },
+  {
+   "name": "Magic Rust #1 — Modded 2x (Только SOLO) | Baйп 21.08",
+   "type": "modded",
+   "players": 78,
+   "maxPlayers": 100,
+   "region": null,
+   "lastWipeMs": 1787306481000
+  },
+  {
+   "name": "Bestrust Solo/Duo/Trio 2x | JUST FULLWIPED 23.08 08/23",
+   "type": "modded",
+   "players": 77,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787478544000
+  },
+  {
+   "name": "Rustoria.co - EU Main",
+   "type": "community",
+   "players": 76,
+   "maxPlayers": 250,
+   "region": "Europa",
+   "lastWipeMs": 1787234714000
+  },
+  {
+   "name": "КЛАССИКА x3 | GGRust #3 | Для нoвичкoв 3x",
+   "type": "modded",
+   "players": 76,
+   "maxPlayers": 150,
+   "region": null,
+   "lastWipeMs": 1787316235000
+  },
+  {
+   "name": "EU Limitless 2x Solo/Duo/Trio | No BP Wipes | Team BPs |x2",
+   "type": "modded",
+   "players": 75,
+   "maxPlayers": 200,
+   "region": "Europa",
+   "lastWipeMs": 1787396549000
+  },
+  {
+   "name": "[EU East] Facepunch 1",
+   "type": "official",
+   "players": 75,
+   "maxPlayers": 400,
+   "region": "Europa",
+   "lastWipeMs": 1786038045000
+  },
+  {
+   "name": "#1 DOZA RUST X20/X50 | MAX5 | LOOT+ | ДЛЯ НОВИЧКОВ",
+   "type": "community",
+   "players": 75,
+   "maxPlayers": 100,
+   "region": null,
+   "lastWipeMs": 1787551549000
+  },
+  {
+   "name": "РУССКИЙ | STEEL | Для Новичков | WIPED 23.08",
+   "type": "community",
+   "players": 74,
+   "maxPlayers": 300,
+   "region": null,
+   "lastWipeMs": 1787486088000
+  },
+  {
+   "name": "Blood Rust - Purple [solo, x2]",
+   "type": "community",
+   "players": 73,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787389722000
+  },
+  {
+   "name": "Magic Rust #8 — Modded 2x (Solo/Duo) | Baйп 21.08",
+   "type": "modded",
+   "players": 73,
+   "maxPlayers": 100,
+   "region": null,
+   "lastWipeMs": 1787306475000
+  },
+  {
+   "name": "Enjoy - Solo/Duo only, no BP wipes. True Vanilla.",
+   "type": "community",
+   "players": 72,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787241343000
+  },
+  {
+   "name": "RUSTBURG.GG #2〔X5/X10|MAX5|LOOT+|FPS+|KITS|TP〕22.08",
+   "type": "modded",
+   "players": 72,
+   "maxPlayers": 100,
+   "region": null,
+   "lastWipeMs": 1787392738000
+  },
+  {
+   "name": "Atlas - US 2X Monthly | Vanilla+ | No BP Wipes",
+   "type": "modded",
+   "players": 71,
+   "maxPlayers": 100,
+   "region": "Norteamérica",
+   "lastWipeMs": 1786039131000
+  },
+  {
+   "name": "RustGames.gg | Lobby 1",
+   "type": "community",
+   "players": 71,
+   "maxPlayers": 100,
+   "region": null,
+   "lastWipeMs": 1787386729000
+  },
+  {
+   "name": "HollowServers.co 5x No BPs [Loot++|MyMini|Shop|Events]10x",
+   "type": "modded",
+   "players": 71,
+   "maxPlayers": 150,
+   "region": null,
+   "lastWipeMs": 1787425094000
+  },
+  {
+   "name": "Rusty Moose |EU Small|",
+   "type": "community",
+   "players": 71,
+   "maxPlayers": 200,
+   "region": "Europa",
+   "lastWipeMs": 1786039442000
+  },
+  {
+   "name": "【英雄PVE】武器特效/BOSS/死亡不掉/无需加速器",
+   "type": "community",
+   "players": 71,
+   "maxPlayers": 123,
+   "region": null,
+   "lastWipeMs": 1786057887000
+  },
+  {
+   "name": "Rustafied.com - EU Small - Friday",
+   "type": "community",
+   "players": 70,
+   "maxPlayers": 100,
+   "region": "Europa",
+   "lastWipeMs": 1787327916000
+  },
+  {
+   "name": "RustOfWar#2 RandomItems 150 islands Solo/Duo | EU East",
+   "type": "community",
+   "players": 70,
+   "maxPlayers": 150,
+   "region": "Europa",
+   "lastWipeMs": 1787486356000
+  },
+  {
+   "name": "Rust Casta FAST [MAX3|X5/X10|TP|Remove|RPG]",
+   "type": "community",
+   "players": 70,
+   "maxPlayers": 150,
+   "region": null,
+   "lastWipeMs": 1787561910000
+  },
+  {
+   "name": "614《断剑》PVE 迷失暗黑|仙途重聚|化凡重修",
+   "type": "community",
+   "players": 70,
+   "maxPlayers": 150,
+   "region": null,
+   "lastWipeMs": 1787316090000
+  },
+  {
+   "name": "[EU/TR] Suayip 5x NO LIMIT | Loot X5 | TP | Home | Kit",
+   "type": "modded",
+   "players": 70,
+   "maxPlayers": 300,
+   "region": "Europa",
+   "lastWipeMs": 1787410767000
+  },
+  {
+   "name": "Magic Rust #21 — Vanilla 2x | HOBOCИБ | Pyccкий",
+   "type": "modded",
+   "players": 69,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787292065000
+  },
+  {
+   "name": "666 RUST /ДЛЯ НОВИЧКОВ /EU MAIN 22.08",
+   "type": "community",
+   "players": 69,
+   "maxPlayers": 650,
+   "region": "Europa",
+   "lastWipeMs": 1787388916000
+  },
+  {
+   "name": "ДЛЯ НОВИЧКОВ | КЛАССИКА X2 |KARMA RUST 22.08",
+   "type": "community",
+   "players": 69,
+   "maxPlayers": 150,
+   "region": null,
+   "lastWipeMs": 1787302719000
+  },
+  {
+   "name": "[EU] Facepunch Premium 1",
+   "type": "official",
+   "players": 68,
+   "maxPlayers": 350,
+   "region": "Europa",
+   "lastWipeMs": 1786038044000
+  },
+  {
+   "name": "GOLD RUST КЛАССИКА X2 ДЛЯ НОВИЧКОВ",
+   "type": "community",
+   "players": 68,
+   "maxPlayers": 100,
+   "region": null,
+   "lastWipeMs": 1787306174000
+  },
+  {
+   "name": "EU FunServer x10000000000|PVP|BATTLEFIELD|SKINS|KITS|TP|MAZE|MI",
+   "type": "modded",
+   "players": 67,
+   "maxPlayers": 150,
+   "region": "Europa",
+   "lastWipeMs": 1787335375000
+  },
+  {
+   "name": "Survivors.gg #6 [ 2x Solo/Duo/Trio/Quad ] FULLWIPED 22.08",
+   "type": "modded",
+   "players": 67,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787403546000
+  },
+  {
+   "name": "TemplarGaming 10x Swift Loot++|PvP|MyMini|SkinBox|x10 JUST WIPE",
+   "type": "modded",
+   "players": 66,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787338505000
+  },
+  {
+   "name": "HIVE X1000000000 #1 MILLION|LOOT++|KITS++|SHOP|",
+   "type": "modded",
+   "players": 66,
+   "maxPlayers": 300,
+   "region": null,
+   "lastWipeMs": 1787246249000
+  },
+  {
+   "name": "РОССИЯ#1|БЕЗ ДОНАТА|ДЛЯ НОВИЧКОВ21.08",
+   "type": "community",
+   "players": 66,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787316593000
+  },
+  {
+   "name": "Magic Rust #25 — 2x | Vanilla+ | Baйп 21.08",
+   "type": "modded",
+   "players": 66,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787306498000
+  },
+  {
+   "name": "Hex AU 5x PVE | Skills | Jetpack | Quests | Custom Weapons",
+   "type": "modded",
+   "players": 66,
+   "maxPlayers": 100,
+   "region": "Oceanía",
+   "lastWipeMs": 1787249729000
+  },
+  {
+   "name": "Rustafied.com - US Solo",
+   "type": "community",
+   "players": 65,
+   "maxPlayers": 100,
+   "region": "Norteamérica",
+   "lastWipeMs": 1787252319000
+  },
+  {
+   "name": "WEREWOLF GAMING.CO 5x Solo/Duo|Loot x5|TP|Homes|Kits|JUST WIPED",
+   "type": "modded",
+   "players": 65,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787403307000
+  },
+  {
+   "name": "404 RUST /ДЛЯ НОВИЧКОВ /СИБИРСКИЙ 23.08",
+   "type": "community",
+   "players": 65,
+   "maxPlayers": 550,
+   "region": null,
+   "lastWipeMs": 1787489727000
+  },
+  {
+   "name": "Magic Rust #12 — Modded 2x (Solo/Duo) | Baйп 21.08",
+   "type": "modded",
+   "players": 65,
+   "maxPlayers": 100,
+   "region": null,
+   "lastWipeMs": 1787306533000
+  },
+  {
+   "name": "|PVE|S.T.A.L.K.E.R|x5-x10|Skill|RaidBase|Zombie|Events|Wipe21.0",
+   "type": "community",
+   "players": 65,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787294633000
+  },
+  {
+   "name": "桃乐丝 PVP - 2倍|独狼|双人|三人|四人|五人|8.24号",
+   "type": "community",
+   "players": 65,
+   "maxPlayers": 100,
+   "region": null,
+   "lastWipeMs": 1787480618000
+  },
+  {
+   "name": "AceRust.com 3x Solo/Duo/Trio|LootX3| Shared BPs",
+   "type": "modded",
+   "players": 64,
+   "maxPlayers": 150,
+   "region": null,
+   "lastWipeMs": 1787507974000
+  },
+  {
+   "name": "WARBANDITS.GG EU 3X SOLO ONLY|Loot+|X3 JUST WIPED",
+   "type": "modded",
+   "players": 64,
+   "maxPlayers": 200,
+   "region": "Europa",
+   "lastWipeMs": 1787489848000
+  },
+  {
+   "name": "EU Limitless 2x Monthly Solo/Duo | No BP Wipes|Noob Friendly|x2",
+   "type": "modded",
+   "players": 64,
+   "maxPlayers": 200,
+   "region": "Europa",
+   "lastWipeMs": 1786038774000
+  },
+  {
+   "name": "WARBANDITS.GG 3X |Solo/Duo/Trio/Quad|LootX3| JUST WIPED",
+   "type": "modded",
+   "players": 63,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787425033000
+  },
+  {
+   "name": "Scrapland x10000000 |BATTLEFIELD|KITS|TP|CLANS|SKINBOX|PVP|",
+   "type": "modded",
+   "players": 62,
+   "maxPlayers": 100,
+   "region": null,
+   "lastWipeMs": 1787335458000
+  },
+  {
+   "name": "Bestrust Solo ONLY 3x #7 | JUST FULLWIPED 24.08 08/24",
+   "type": "modded",
+   "players": 62,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787564733000
+  },
+  {
+   "name": "РОССИЯ#2|КЛАССИКА|ДЛЯ НОВИЧКОВ21.08",
+   "type": "community",
+   "players": 62,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787316777000
+  },
+  {
+   "name": "RustForNoobs.com | Mondays | Solo Duo Trio | AU 24/08 24.08",
+   "type": "community",
+   "players": 62,
+   "maxPlayers": 150,
+   "region": "Oceanía",
+   "lastWipeMs": 1787554531000
+  },
+  {
+   "name": "[EU] Facepunch 1",
+   "type": "official",
+   "players": 61,
+   "maxPlayers": 400,
+   "region": "Europa",
+   "lastWipeMs": 1786037989000
+  },
+  {
+   "name": "RustOps - Solo/Duo | FULLWIPE 23/08 23.08 08/23",
+   "type": "community",
+   "players": 61,
+   "maxPlayers": 215,
+   "region": null,
+   "lastWipeMs": 1787479055000
+  },
+  {
+   "name": "Rustoria.co - SEA Main",
+   "type": "community",
+   "players": 61,
+   "maxPlayers": 200,
+   "region": "Asia",
+   "lastWipeMs": 1787209809000
+  },
+  {
+   "name": "AceRust.com 5x No BPs [Loot++|PvP|MyMini|Shop]10x",
+   "type": "modded",
+   "players": 59,
+   "maxPlayers": 150,
+   "region": null,
+   "lastWipeMs": 1787424447000
+  },
+  {
+   "name": "Rustopia.gg - EU Large",
+   "type": "community",
+   "players": 59,
+   "maxPlayers": 200,
+   "region": "Europa",
+   "lastWipeMs": 1786038972000
+  },
+  {
+   "name": "РУССКИЙ РАЙ | РОССИЯ | ДЛЯ НОВИЧКОВ",
+   "type": "community",
+   "players": 59,
+   "maxPlayers": 1000,
+   "region": null,
+   "lastWipeMs": 1787309266000
+  },
+  {
+   "name": "WARBANDITS.GG 3X SOLO ONLY|Loot+|X3 JUST WIPED",
+   "type": "modded",
+   "players": 58,
+   "maxPlayers": 200,
+   "region": null,
+   "lastWipeMs": 1787425021000
+  },
+  {
+   "name": "Rustafied.com - EU Low Pop",
+   "type": "community",
+   "players": 58,
+   "maxPlayers": 150,
+   "region": "Europa",
+   "lastWipeMs": 1786038440000
+  },
+  {
+   "name": "RustSpain.com | EU Solo Only",
+   "type": "community",
+   "players": 58,
+   "maxPlayers": 100,
+   "region": "Europa",
+   "lastWipeMs": 1787234138000
+  },
+  {
+   "name": "BAIDEN RUST X1000000000 |NoLimit|PVP|FUN|KITS|RU|EU|AIM|BED|BRO",
+   "type": "modded",
+   "players": 58,
+   "maxPlayers": 200,
+   "region": "Europa",
+   "lastWipeMs": 1787388903000
+  },
+  {
+   "name": "Rustafied.com - SEA Long",
+   "type": "community",
+   "players": 58,
+   "maxPlayers": 200,
+   "region": "Asia",
+   "lastWipeMs": 1786038426000
+  }
+ ]
+}

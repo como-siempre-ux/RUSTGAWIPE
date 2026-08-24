@@ -46,6 +46,7 @@ interface Crudo {
   port: number | null;
   players: number | null;
   maxPlayers: number | null;
+  queued: number | null;
   country: string | null;
   /** Región según el código numérico de Steam, cuando la fuente lo da. */
   region: string | null;
@@ -103,6 +104,7 @@ async function desdeSteam(key: string): Promise<Crudo[]> {
       port: (s.gameport as number) ?? (portStr ? Number(portStr) : null),
       players: (s.players as number) ?? tags.currentPlayers,
       maxPlayers: (s.max_players as number) ?? tags.maxPlayers,
+      queued: tags.queued,
       country: null,
       region: steamRegionLabel(s.region as number),
       lastWipeMs: tags.bornMs,
@@ -120,13 +122,25 @@ function desdeCatalogo(): Crudo[] {
     rustType: c.type,
     ip: null,
     port: null,
-    players: c.typicalPlayers,
+    players: c.players,
     maxPlayers: c.maxPlayers,
-    country: c.country,
-    region: null,
-    lastWipeMs: null,
-    worldSize: c.mapSize,
+    queued: null,
+    country: null,
+    region: c.region,
+    lastWipeMs: c.lastWipeMs,
+    worldSize: null,
   }));
+}
+
+/** Rust cuenta la cola dentro de `players`; aquí se separan. */
+function separarCola(players: number | null, maxPlayers: number | null, queued: number | null) {
+  if (players === null || maxPlayers === null) return { players, maxPlayers, queued };
+  const cola = queued && queued > 0 ? queued : Math.max(0, players - maxPlayers);
+  return {
+    players: Math.max(0, Math.min(players - cola, maxPlayers)),
+    maxPlayers,
+    queued: cola > 0 ? cola : null,
+  };
 }
 
 function normalizar(crudos: Crudo[], source: string) {
@@ -151,8 +165,7 @@ function normalizar(crudos: Crudo[], source: string) {
       name: raw.name,
       type,
       connect: raw.ip && raw.port ? `${raw.ip}:${raw.port}` : null,
-      players: raw.players,
-      maxPlayers: raw.maxPlayers,
+      ...separarCola(raw.players, raw.maxPlayers, raw.queued),
       groupLimit: detectGroupLimit(raw.name),
       country: raw.country ? raw.country.toUpperCase() : null,
       // La región de Steam manda; si no la da, se deduce del nombre.

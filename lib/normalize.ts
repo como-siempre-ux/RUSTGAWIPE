@@ -10,6 +10,27 @@ import type { RawServer } from './sources/battlemetrics';
 import type { RustServer, ServerType } from './types';
 import { CONFIDENCE_WEIGHT, resolveNextWipe } from './wipe-schedule';
 
+/**
+ * Rust mete la cola dentro del número de jugadores, así que un servidor de
+ * 700 plazas puede decir que tiene 785. Aquí se separan: dentro van los que
+ * caben, y el resto es cola.
+ *
+ * Se usa la etiqueta `qp` de Steam cuando está; si no, lo que se sale del
+ * aforo. Nunca al revés: `qp` es el dato, el desbordamiento es la deducción.
+ */
+function separarCola(
+  players: number | null,
+  maxPlayers: number | null,
+  queued: number | null,
+): { players: number | null; maxPlayers: number | null; queued: number | null } {
+  if (players === null || maxPlayers === null) return { players, maxPlayers, queued };
+
+  const cola = queued && queued > 0 ? queued : Math.max(0, players - maxPlayers);
+  const dentro = Math.max(0, Math.min(players - cola, maxPlayers));
+
+  return { players: dentro, maxPlayers, queued: cola > 0 ? cola : null };
+}
+
 function parseIso(iso: string | null | undefined): number | null {
   if (!iso) return null;
   const ms = Date.parse(iso);
@@ -58,11 +79,10 @@ export function normalizeServer(
     name: raw.name,
     type,
     connect: raw.ip && raw.port ? `${raw.ip}:${raw.port}` : null,
-    players: raw.players,
-    maxPlayers: raw.maxPlayers,
+    ...separarCola(raw.players, raw.maxPlayers, raw.queued ?? null),
     groupLimit: detectGroupLimit(raw.name),
     country: raw.country ? raw.country.toUpperCase() : null,
-    region: regionLabel(raw.name, raw.country),
+    region: raw.region ?? regionLabel(raw.name, raw.country),
     lastWipeMs: resolution.lastWipeMs,
     lastWipeIsDerived: resolution.lastWipeIsDerived,
     nextWipeMs: resolution.nextWipeMs,
@@ -131,7 +151,8 @@ export function sortByPopulation(servers: RustServer[]): RustServer[] {
     if (a.nextWipeMs === null && b.nextWipeMs === null) return 0;
     if (a.nextWipeMs === null) return 1;
     if (b.nextWipeMs === null) return -1;
-    return a.nextWipeMs - b.nextWipeMs;
+    const wipe = a.nextWipeMs - b.nextWipeMs;
+    return wipe !== 0 ? wipe : a.id.localeCompare(b.id);
   });
 }
 
@@ -139,7 +160,8 @@ export function sortByPopulation(servers: RustServer[]): RustServer[] {
 export function sortServers(servers: RustServer[]): RustServer[] {
   return [...servers].sort((a, b) => {
     if (a.nextWipeMs === null && b.nextWipeMs === null) {
-      return (b.players ?? 0) - (a.players ?? 0);
+      const pob = (b.players ?? 0) - (a.players ?? 0);
+      return pob !== 0 ? pob : a.id.localeCompare(b.id);
     }
     if (a.nextWipeMs === null) return 1;
     if (b.nextWipeMs === null) return -1;
@@ -149,7 +171,13 @@ export function sortServers(servers: RustServer[]): RustServer[] {
     const conf = CONFIDENCE_WEIGHT[a.confidence] - CONFIDENCE_WEIGHT[b.confidence];
     if (conf !== 0) return conf;
 
-    return (b.players ?? 0) - (a.players ?? 0);
+    const pob = (b.players ?? 0) - (a.players ?? 0);
+    if (pob !== 0) return pob;
+
+    // Último desempate por id: sin esto el orden dependía del orden de
+    // entrada, así que reordenar la misma lista podía dar resultados
+    // distintos. En un sitio estático eso se nota entre recargas.
+    return a.id.localeCompare(b.id);
   });
 }
 
@@ -176,14 +204,18 @@ export function catalogAsServers(nowMs: number): RustServer[] {
     id: c.id,
     name: c.name,
     rustType: c.type,
+    // Sin ip: las direcciones cambian entre wipes y no se inventan.
     ip: null,
     port: null,
-    players: c.typicalPlayers,
+    players: c.players,
     maxPlayers: c.maxPlayers,
-    country: c.country,
-    lastWipeIso: null,
+    queued: null,
+    // Ni país ni tamaño de mapa: la foto no los trae y no se rellenan a ojo.
+    country: null,
+    region: c.region,
+    lastWipeIso: c.lastWipeMs ? new Date(c.lastWipeMs).toISOString() : null,
     nextWipeIso: null,
-    worldSize: c.mapSize,
+    worldSize: null,
     worldSeed: null,
     url: null,
   }));

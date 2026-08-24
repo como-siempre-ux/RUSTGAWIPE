@@ -26,7 +26,11 @@ export interface RawServer {
   port: number | null;
   players: number | null;
   maxPlayers: number | null;
+  /** Gente en cola, si la fuente la da. */
+  queued?: number | null;
   country: string | null;
+  /** Región si la fuente la da directamente (Steam la da; BattleMetrics no). */
+  region?: string | null;
   lastWipeIso: string | null;
   nextWipeIso: string | null;
   worldSize: number | null;

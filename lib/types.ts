@@ -72,6 +72,15 @@ export interface RustServer {
   players: number | null;
   maxPlayers: number | null;
   /**
+   * Gente esperando para entrar.
+   *
+   * Rust cuenta la cola dentro de `players`, así que sin esto salían cosas
+   * como "785/700", que parece un error de la web. La cola se separa y se
+   * enseña aparte, que además es información útil: un servidor con cola
+   * larga está petado.
+   */
+  queued: number | null;
+  /**
    * Tamaño máximo de grupo: `1` solo, `2` dúo… `0` sin límite declarado,
    * `null` no se ha podido determinar. Sale del nombre del servidor.
    */

@@ -66,6 +66,18 @@ const INTERVAL_PATTERNS: Array<{ re: RegExp; days: number }> = [
   { re: /\b(daily|diario|24\s*h|24h)\b/, days: 1 },
   { re: /\b(bi[- ]?weekly|biweekly|quincenal|2\s*weeks?|two\s*weeks?|14\s*d(ays?)?)\b/, days: 14 },
   { re: /\b(weekly|semanal|wipes?\s+(thursday|monday|friday|tuesday|wednesday|saturday|sunday)|7\s*d(ays?)?)\b/, days: 7 },
+  /**
+   * Un día de la semana suelto en el nombre.
+   *
+   * En Rust, poner "Mondays" o "SUNDAY 2x" en el nombre significa una cosa y
+   * sólo una: wipea ese día, todas las semanas. Antes hacía falta que pusiera
+   * literalmente "wipes monday", así que "[AU] Winterust - 2x Mondays" salía
+   * como mensual. Va el último para que "bi-weekly thursday" siga ganando.
+   */
+  {
+    re: /\b(mondays?|tuesdays?|wednesdays?|thursdays?|fridays?|saturdays?|sundays?|lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bados?|domingos?)\b/,
+    days: 7,
+  },
 ];
 
 const MONTHLY_PATTERN = /\b(monthly|mensual|vanilla|force\s*wipe\s*only|month(ly)?\s*wipes?|long\s*wipe)\b/;
@@ -224,10 +236,33 @@ export function resolveNextWipe(input: ResolveInput, nowMs: number): WipeResolut
    * puede decir cuándo wipeó por última vez.
    */
   const lastWipe = (): Pick<WipeResolution, 'lastWipeMs' | 'lastWipeIsDerived'> => {
-    if (input.lastWipeMs) return { lastWipeMs: input.lastWipeMs, lastWipeIsDerived: false };
+    /**
+     * Un dato guardado con más de un ciclo de antigüedad ya no es "el último
+     * wipe": es una foto vieja. Sigue valiendo como fase —dice qué día wipea—
+     * pero enseñarlo tal cual diría "wipeó hace tres meses" en un servidor
+     * que wipea cada semana. En ese caso manda el calendario.
+     */
+    if (input.lastWipeMs) {
+      const ciclo = input.rule ? diasDeLaRegla(input.rule) : detectIntervalDays(input.name, input.tags);
+
+      if (ciclo === null) {
+        // Ciclo mensual: el listón es el forced wipe. Si el ancla es anterior,
+        // el servidor wipeó en el forced wipe aunque su foto no lo recogiera.
+        const forcedAnterior = previousForcedWipe(nowMs);
+        if (input.lastWipeMs >= forcedAnterior) {
+          return { lastWipeMs: input.lastWipeMs, lastWipeIsDerived: false };
+        }
+        return { lastWipeMs: forcedAnterior, lastWipeIsDerived: true };
+      }
+
+      if (nowMs - input.lastWipeMs <= ciclo * DAY_MS) {
+        return { lastWipeMs: input.lastWipeMs, lastWipeIsDerived: false };
+      }
+    }
     if (input.rule) {
       return { lastWipeMs: previousWipeFromRule(input.rule, nowMs), lastWipeIsDerived: true };
     }
+    if (input.lastWipeMs) return { lastWipeMs: input.lastWipeMs, lastWipeIsDerived: false };
     return { lastWipeMs: null, lastWipeIsDerived: false };
   };
 
@@ -243,9 +278,31 @@ export function resolveNextWipe(input: ResolveInput, nowMs: number): WipeResolut
     };
   }
 
+  /**
+   * El dato observado gana al calendario cuando lo desmiente.
+   *
+   * El calendario de una comunidad se aplica a todos sus servidores, pero
+   * algunos son la excepción: "Rusty Moose |US Small|" salía como semanal
+   * porque Rusty Moose wipea los jueves, mientras la fuente decía que su
+   * último wipe fue hace 18 días. Uno de los dos miente, y no es el
+   * timestamp del propio servidor.
+   *
+   * El margen es generoso (dos ciclos y medio) para no saltar por un wipe
+   * retrasado o un forced wipe que descoloca la cuenta una semana.
+   */
+  const reglaDesmentida =
+    input.rule !== null &&
+    input.rule !== undefined &&
+    input.lastWipeMs != null &&
+    (() => {
+      const ciclo = diasDeLaRegla(input.rule!);
+      if (ciclo === null) return false; // los mensuales no se juzgan así
+      return nowMs - input.lastWipeMs! > ciclo * 2.5 * DAY_MS;
+    })();
+
   // 2. Calendario de la comunidad. Si no está verificado contra una fuente
   //    oficial se baja a `estimado`: se conoce el ciclo, no la hora exacta.
-  if (input.rule) {
+  if (input.rule && !reglaDesmentida) {
     return {
       nextWipeMs: nextWipeFromRule(input.rule, nowMs),
       ...lastWipe(),
@@ -280,7 +337,9 @@ export function resolveNextWipe(input: ResolveInput, nowMs: number): WipeResolut
         confidence: 'estimado',
         cadence: 'monthly',
         cadenceDays: null,
-        explanation: 'sin pistas de ciclo en el nombre: se asume mensual (forced wipe).',
+        explanation: reglaDesmentida
+          ? `el calendario de ${input.rule!.community} no cuadra con el último wipe real de este servidor; se asume mensual.`
+          : 'sin pistas de ciclo en el nombre: se asume mensual (forced wipe).',
       };
     }
 
@@ -292,14 +351,28 @@ export function resolveNextWipe(input: ResolveInput, nowMs: number): WipeResolut
 
     // Un wipe estimado nunca puede caer después del forced wipe.
     const clamped = Math.min(next, forced);
+
+    /**
+     * El último wipe se recalcula si el dato guardado ya tiene más de un
+     * ciclo. Un `born` de hace tres meses sigue valiendo como **fase** —dice
+     * qué día de la semana wipea— pero enseñarlo como "wipeó hace 3 meses"
+     * sería falso en un servidor semanal. Se avanza hasta el ciclo actual y
+     * se marca como calculado.
+     */
+    const anclaVieja = nowMs - input.lastWipeMs > detected * DAY_MS;
+    const ultimo = anclaVieja
+      ? { lastWipeMs: clamped - detected * DAY_MS, lastWipeIsDerived: true }
+      : { lastWipeMs: input.lastWipeMs, lastWipeIsDerived: false };
+
     return {
       nextWipeMs: clamped,
-      ...lastWipe(),
+      ...ultimo,
       confidence: 'estimado',
       cadence: cadenceFromDays(detected),
       cadenceDays: detected,
-      explanation:
-        clamped === forced && next > forced
+      explanation: reglaDesmentida
+        ? `el calendario de ${input.rule!.community} no cuadra con el último wipe real de este servidor, así que se estima a partir de él.`
+        : clamped === forced && next > forced
           ? `ciclo de ${detected} días detectado, recortado al forced wipe.`
           : `último wipe + ciclo de ${detected} días detectado en el nombre.`,
     };

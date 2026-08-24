@@ -91,17 +91,29 @@ direcciones**.
 ## Precisión de los horarios
 
 Adivinar el ciclo de wipe leyendo el nombre del servidor funciona regular. Las comunidades
-grandes publican su calendario, así que para ellas se usa el calendario y no la heurística.
-Eso está en [`lib/catalog.ts`](lib/catalog.ts): **145 servidores de 18 comunidades** —
-Rustafied, Rusticated, Rusty Moose, Rustoria, Atlas, WarBandits, Survivors.gg, Werewolf Gaming,
-HollowServers.co, Magic Rust, Rustopia, Bloo Lagoon, PickleRust, RustEZ, Rustinity, Rust Factor,
-Vital Rust y los oficiales de Facepunch.
+grandes publican su calendario, así que para ellas se usa el calendario y no la heurística. Eso
+está en [`lib/catalog.ts`](lib/catalog.ts): 17 comunidades — Rustafied, Rusticated, Rusty Moose,
+Rustoria, Atlas, WarBandits, Survivors.gg, Werewolf Gaming, HollowServers.co, Magic Rust,
+Rustopia, Bloo Lagoon, PickleRust, RustEZ, Rustinity, Rust Factor, Vital Rust y los oficiales de
+Facepunch.
 
-Los nombres y los ciclos salen de las listas reales de cada organización, no de suposiciones: los
-13 servidores de Survivors.gg con su par de días cada uno, los 15 de Atlas con su ciclo por rate,
-los 12 de Rustopia. Hay tests que comprueban que ningún servidor del catálogo se queda huérfano y
-que ninguna comunidad se queda sin servidores, que es como se detecta que una regex de `match` ha
-dejado de casar.
+### Por qué el catálogo de reserva ya no se escribe a mano
+
+Antes la lista de servidores de reserva estaba escrita a mano, y eso salió mal: **al ampliarla
+con servidores de dúo se colaron 37 nombres que no existen**, y las poblaciones y tamaños de mapa
+de los 145 eran números puestos a ojo. Un servidor inventado es peor que no tener servidor,
+porque la web lo dice con la misma cara con la que dice la verdad.
+
+Ahora la reserva es [`lib/catalog-snapshot.json`](lib/catalog-snapshot.json): una **foto de la
+lista real de Steam**, que se regenera con `npm run build:snapshot`. No lleva ips ni tamaños de
+mapa, porque la foto no los trae y no se rellenan a ojo.
+
+Su `lastWipeMs` vale como **ancla de fase** —dice qué día de la semana wipea— y no como fecha
+para enseñar: al usarla se avanza al ciclo actual, para no decir "wipeó hace tres meses" de un
+servidor semanal.
+
+Lo que sí sigue escrito a mano son los **calendarios de las comunidades**, que están contrastados
+contra sus webs y llevan su `verified`.
 
 Cada entrada lleva `sourceUrl` y `verified` con la fecha en que se comprobó contra la web
 oficial. **Cuando una comunidad cambia su calendario, esto se queda viejo**, y por eso la UI
@@ -199,7 +211,7 @@ Todo el cálculo vive en [`lib/wipe-schedule.ts`](lib/wipe-schedule.ts) y ningun
   enero.
 
 ```bash
-npm test        # 152 tests
+npm test        # 170 tests
 npm run typecheck
 ```
 
