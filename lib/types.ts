@@ -27,6 +27,11 @@ export interface WipeResolution {
   lastWipeIsDerived: boolean;
   confidence: WipeConfidence;
   cadence: Cadence | null;
+  /**
+   * Días entre wipes cuando se conocen. `null` en los mensuales, porque el
+   * forced wipe cae entre 28 y 35 días según el mes.
+   */
+  cadenceDays: number | null;
   /** Frase corta para el tooltip: de dónde sale el dato. */
   explanation: string;
 }
@@ -80,6 +85,7 @@ export interface RustServer {
   nextWipeMs: number | null;
   confidence: WipeConfidence;
   cadence: Cadence | null;
+  cadenceDays: number | null;
   wipeExplanation: string;
   mapSize: number | null;
   mapSeed: number | null;

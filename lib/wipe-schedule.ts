@@ -238,6 +238,7 @@ export function resolveNextWipe(input: ResolveInput, nowMs: number): WipeResolut
       ...lastWipe(),
       confidence: 'confirmado',
       cadence: cadenceLabel(input.rule?.cadence ?? null, input.name, input.tags),
+      cadenceDays: input.rule ? diasDeLaRegla(input.rule) : detectIntervalDays(input.name, input.tags),
       explanation: 'el servidor publica la fecha de su próximo wipe.',
     };
   }
@@ -250,6 +251,7 @@ export function resolveNextWipe(input: ResolveInput, nowMs: number): WipeResolut
       ...lastWipe(),
       confidence: input.rule.approximate ? 'estimado' : 'programado',
       cadence: input.rule.cadence,
+      cadenceDays: diasDeLaRegla(input.rule),
       explanation: input.rule.approximate
         ? `ciclo conocido de ${input.rule.community}, sin hora confirmada: ${input.rule.human}.`
         : `calendario publicado de ${input.rule.community}: ${input.rule.human}.`,
@@ -264,6 +266,7 @@ export function resolveNextWipe(input: ResolveInput, nowMs: number): WipeResolut
       ...lastWipe(),
       confidence: 'programado',
       cadence: 'monthly',
+      cadenceDays: null,
       explanation: 'servidor oficial: wipea en el forced wipe mensual.',
     };
   }
@@ -276,6 +279,7 @@ export function resolveNextWipe(input: ResolveInput, nowMs: number): WipeResolut
         ...lastWipe(),
         confidence: 'estimado',
         cadence: 'monthly',
+        cadenceDays: null,
         explanation: 'sin pistas de ciclo en el nombre: se asume mensual (forced wipe).',
       };
     }
@@ -293,6 +297,7 @@ export function resolveNextWipe(input: ResolveInput, nowMs: number): WipeResolut
       ...lastWipe(),
       confidence: 'estimado',
       cadence: cadenceFromDays(detected),
+      cadenceDays: detected,
       explanation:
         clamped === forced && next > forced
           ? `ciclo de ${detected} días detectado, recortado al forced wipe.`
@@ -306,8 +311,23 @@ export function resolveNextWipe(input: ResolveInput, nowMs: number): WipeResolut
     ...lastWipe(),
     confidence: 'desconocido',
     cadence: null,
+    cadenceDays: null,
     explanation: 'no hay fecha de último wipe ni calendario conocido.',
   };
+}
+
+/**
+ * Días de ciclo de un calendario. Si wipea varios días por semana el ciclo no
+ * es de siete: WarBandits wipea lunes y viernes, así que el mapa dura tres o
+ * cuatro días.
+ */
+function diasDeLaRegla(rule: ScheduleRule): number | null {
+  if (rule.cadence === 'monthly') return null;
+  if (rule.cadence === 'biweekly') return 14;
+  if (rule.cadence === 'custom') return rule.intervalDays ?? null;
+
+  const cuantos = rule.weekdays?.length ?? 1;
+  return cuantos > 1 ? Math.round((7 / cuantos) * 10) / 10 : 7;
 }
 
 function cadenceFromDays(days: number): Cadence {

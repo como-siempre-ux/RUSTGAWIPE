@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 
+import { describeCadence, duracionDelMapa } from '@/lib/cadence';
 import { groupLimitLabel } from '@/lib/group-size';
 import { HOUR_MS, formatRelative } from '@/lib/time';
 import type { RustServer, WipeConfidence } from '@/lib/types';
@@ -56,6 +57,11 @@ export function ServerCard({
   /** Wipeó hace menos de un día: mapa recién estrenado. */
   const fresh = server.lastWipeMs !== null && nowMs - server.lastWipeMs < 24 * HOUR_MS;
   const groupLabel = groupLimitLabel(server.groupLimit);
+  const cadencia = describeCadence(
+    server.cadence,
+    server.cadenceDays,
+    server.rule?.weekdays?.length ?? 1,
+  );
 
   const absolute = useMemo(
     () =>
@@ -87,6 +93,18 @@ export function ServerCard({
             <span className={`stencil rounded-sm border px-1.5 py-0.5 ${TYPE_STYLE[server.type]}`}>
               {TYPE_LABEL[server.type]}
             </span>
+            {cadencia && (
+              <span
+                className="stencil rounded-sm border border-steel/30 bg-steel/10 px-1.5 py-0.5 text-steel"
+                title={
+                  cadencia.days
+                    ? `el mapa dura ${duracionDelMapa(cadencia.days)}`
+                    : 'wipea con el forced wipe mensual de Facepunch'
+                }
+              >
+                {cadencia.label}
+              </span>
+            )}
             {groupLabel && (
               <span className="stencil rounded-sm border border-weld bg-weld/40 px-1.5 py-0.5 text-ash">
                 {groupLabel}
@@ -139,6 +157,14 @@ export function ServerCard({
                 'sin datos'
               )}
             </Fact>
+
+            {cadencia && (
+              <Fact label="el mapa dura">
+                {/* La cadencia sola dice "cada cuánto"; esto dice "cuánto
+                    aguanta", que es lo que se pregunta al elegir servidor. */}
+                {cadencia.days === null ? 'hasta el forced wipe' : duracionDelMapa(cadencia.days)}
+              </Fact>
+            )}
 
             {server.mapSize && (
               <Fact label="mapa">

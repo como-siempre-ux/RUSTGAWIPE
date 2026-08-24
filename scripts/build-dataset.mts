@@ -174,6 +174,7 @@ function normalizar(crudos: Crudo[], source: string) {
       lastWipeIsDerived: false,
       confidence: 'desconocido',
       cadence: null,
+      cadenceDays: null,
       wipeExplanation: '',
     });
   }

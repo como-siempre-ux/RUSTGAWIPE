@@ -68,6 +68,7 @@ export function normalizeServer(
     nextWipeMs: resolution.nextWipeMs,
     confidence: resolution.confidence,
     cadence: resolution.cadence,
+    cadenceDays: resolution.cadenceDays,
     wipeExplanation: resolution.explanation,
     mapSize: raw.worldSize,
     mapSeed: raw.worldSeed,
@@ -105,6 +106,7 @@ export function reresolve(server: RustServer, nowMs: number): RustServer {
     lastWipeIsDerived: r.lastWipeIsDerived,
     confidence: r.confidence,
     cadence: r.cadence,
+    cadenceDays: r.cadenceDays,
     wipeExplanation: r.explanation,
   };
 }

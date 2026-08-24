@@ -135,6 +135,19 @@ el nombre ("Solo/Duo/Trio", "4 Max", "No Limit"), así que se deduce de ahí en
 El filtro de grupo usa tope exacto, no "hasta": quien busca trío quiere servidores de trío. Los
 chips sin ningún servidor detrás se desactivan en vez de llevar a una lista vacía.
 
+### Cada cuánto wipea, y cuánto dura el mapa
+
+Cada fila lleva su ciclo — *semanal*, *quincenal*, *mensual*, *cada 3 días* — y, junto a los
+demás datos, cuánto aguanta el mapa.
+
+El caso que hay que hacer bien: una comunidad puede tener cadencia semanal y wipear **dos días
+por semana**. WarBandits wipea lunes y viernes; llamar a eso "semanal" mentiría sobre lo que
+dura el mapa, que es lo que se mira al elegir servidor. Por eso `describeCadence` cuenta los
+días de wipe de la regla y dice *2 veces por semana · 3,5 días*.
+
+En los mensuales no se pone un número: el forced wipe cae entre 28 y 35 días según el mes, así
+que dice "hasta el forced wipe".
+
 ### El último wipe
 
 El catálogo no observa nada en vivo, pero el último wipe **sí se puede calcular**: es la misma
@@ -186,7 +199,7 @@ Todo el cálculo vive en [`lib/wipe-schedule.ts`](lib/wipe-schedule.ts) y ningun
   enero.
 
 ```bash
-npm test        # 131 tests
+npm test        # 152 tests
 npm run typecheck
 ```
 
